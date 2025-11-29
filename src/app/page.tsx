@@ -400,8 +400,8 @@ export default function HomePage() {
             />
             <FeatureCard
               icon={<PiggyBank className="h-6 w-6" />}
-              title="Anggaran Cerdas"
-              description="Atur batas pengeluaran per kategori dan dapatkan peringatan sebelum over budget."
+              title="Anggaran Bulanan"
+              description="Atur batas pengeluaran per kategori dan pantau progress anggaran secara real-time."
               color="purple"
             />
             <FeatureCard
@@ -412,27 +412,51 @@ export default function HomePage() {
             />
             <FeatureCard
               icon={<Target className="h-6 w-6" />}
-              title="Goals & Simulasi"
-              description="Tetapkan target tabungan dan simulasi berapa lama untuk mencapainya dengan nabung harian."
+              title="Target Tabungan"
+              description="Tetapkan target tabungan dengan prioritas dan tracking progress untuk mencapai tujuan finansial."
               color="rose"
             />
             <FeatureCard
               icon={<CalendarClock className="h-6 w-6" />}
               title="Pengingat Tagihan"
-              description="Catat tagihan bulanan dan dapatkan reminder sebelum jatuh tempo."
+              description="Catat tagihan bulanan dan pantau jatuh tempo untuk menghindari keterlambatan bayar."
               color="cyan"
             />
             <FeatureCard
               icon={<Newspaper className="h-6 w-6" />}
               title="Berita Finansial"
-              description="Update tips keuangan dan berita finansial terkini langsung di dashboard."
+              description="Update berita finansial terkini dari sumber terpercaya langsung di dashboard."
               color="emerald"
+            />
+            <FeatureCard
+              icon={<Calculator className="h-6 w-6" />}
+              title="Transaksi Berulang"
+              description="Atur transaksi berulang otomatis untuk pemasukan/pengeluaran rutin bulanan."
+              color="blue"
+            />
+            <FeatureCard
+              icon={<BarChart3 className="h-6 w-6" />}
+              title="Dashboard Kustom"
+              description="Atur tata letak widget dashboard sesuai kebutuhanmu dengan drag & drop."
+              color="purple"
+            />
+            <FeatureCard
+              icon={<Zap className="h-6 w-6" />}
+              title="Export Data"
+              description="Export laporan keuangan dalam format CSV untuk backup atau analisis lebih lanjut."
+              color="amber"
+            />
+            <FeatureCard
+              icon={<Smartphone className="h-6 w-6" />}
+              title="Responsive Design"
+              description="Akses dari desktop, tablet, atau smartphone dengan tampilan yang optimal."
+              color="rose"
             />
             <FeatureCard
               icon={<Shield className="h-6 w-6" />}
               title="Privasi Terjamin"
               description="Data terenkripsi, tanpa iklan, tanpa penjualan data. Keuanganmu adalah rahasiamu."
-              color="amber"
+              color="cyan"
             />
           </div>
         </div>
@@ -456,8 +480,8 @@ export default function HomePage() {
                   <Wallet className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">Dashboard Lengkap</h3>
-                  <p className="text-muted-foreground text-sm">Lihat total saldo, pemasukan, pengeluaran dalam satu tampilan</p>
+                  <h3 className="font-semibold text-foreground mb-1">Dashboard Kustom</h3>
+                  <p className="text-muted-foreground text-sm">Atur widget dengan drag & drop, lihat saldo, grafik, dan transaksi</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -466,7 +490,7 @@ export default function HomePage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">Scan Struk Otomatis</h3>
-                  <p className="text-muted-foreground text-sm">Foto struk dan AI akan input transaksi otomatis</p>
+                  <p className="text-muted-foreground text-sm">Foto struk dan AI OCR akan ekstrak detail transaksi otomatis</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -474,8 +498,17 @@ export default function HomePage() {
                   <BarChart3 className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">Laporan Visual</h3>
-                  <p className="text-muted-foreground text-sm">Grafik interaktif untuk analisis keuangan bulanan</p>
+                  <h3 className="font-semibold text-foreground mb-1">Laporan & Anggaran</h3>
+                  <p className="text-muted-foreground text-sm">Grafik interaktif, kategori breakdown, dan tracking anggaran</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-xl bg-rose-500/10 text-rose-500">
+                  <Target className="h-6 w-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">Goals & Tagihan</h3>
+                  <p className="text-muted-foreground text-sm">Target tabungan dengan prioritas dan reminder tagihan bulanan</p>
                 </div>
               </div>
               
