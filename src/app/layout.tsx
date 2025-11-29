@@ -21,9 +21,8 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased`}>
         <SessionProvider>
           <ThemeProvider>
-            <div className="min-h-screen bg-background">
-              <div className="fixed inset-0 bg-[url('/grid.svg')] bg-center opacity-[0.02] dark:opacity-[0.03]" />
-              <div className="relative">{children}</div>
+            <div className="min-h-screen bg-background relative">
+              {children}
             </div>
           </ThemeProvider>
         </SessionProvider>
