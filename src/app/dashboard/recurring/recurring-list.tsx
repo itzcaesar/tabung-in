@@ -69,11 +69,33 @@ function getDaysUntilNext(nextDate: Date): number {
   return Math.ceil((next.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 }
 
+// Format number with thousand separators (150000 -> 150.000)
+function formatNumberInput(value: string): string {
+  const numbers = value.replace(/\D/g, '');
+  return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+// Parse formatted number back to raw number (150.000 -> 150000)
+function parseFormattedNumber(value: string): string {
+  return value.replace(/\./g, '');
+}
+
 export function RecurringTransactionsList({ recurring, accounts, categories }: Props) {
   const [isPending, startTransition] = useTransition();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<RecurringTransaction | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [amountDisplay, setAmountDisplay] = useState('');
+  const [amountRaw, setAmountRaw] = useState('');
+  const [selectedType, setSelectedType] = useState<'pemasukan' | 'pengeluaran'>('pengeluaran');
+
+  const filteredCategories = categories.filter(cat => cat.type === selectedType);
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = parseFormattedNumber(e.target.value);
+    setAmountRaw(raw);
+    setAmountDisplay(formatNumberInput(raw));
+  };
 
   const handleToggle = (id: string, currentStatus: boolean | null) => {
     startTransition(async () => {
@@ -108,11 +130,18 @@ export function RecurringTransactionsList({ recurring, accounts, categories }: P
 
   const openEditModal = (item: RecurringTransaction) => {
     setEditingItem(item);
+    const rawAmount = item.amount || '';
+    setAmountRaw(rawAmount);
+    setAmountDisplay(formatNumberInput(rawAmount));
+    setSelectedType(item.type as 'pemasukan' | 'pengeluaran');
     setIsModalOpen(true);
   };
 
   const openNewModal = () => {
     setEditingItem(null);
+    setAmountRaw('');
+    setAmountDisplay('');
+    setSelectedType('pengeluaran');
     setIsModalOpen(true);
   };
 
@@ -122,7 +151,7 @@ export function RecurringTransactionsList({ recurring, accounts, categories }: P
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <Play className="h-4 w-4 text-emerald-500" />
+            <Play className="h-4 w-4 text-foreground" />
             Transaksi Aktif ({activeRecurring.length})
           </CardTitle>
         </CardHeader>
@@ -149,14 +178,10 @@ export function RecurringTransactionsList({ recurring, accounts, categories }: P
                     className="flex items-center justify-between p-4 bg-muted/30 rounded-xl hover:bg-muted/50 transition-colors"
                   >
                     <div className="flex items-center gap-4">
-                      <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${
-                        item.type === 'pemasukan' 
-                          ? 'bg-emerald-500/10' 
-                          : 'bg-red-500/10'
-                      }`}>
+                      <div className="h-10 w-10 rounded-xl flex items-center justify-center bg-foreground/10">
                         {item.type === 'pemasukan' 
-                          ? <TrendingUp className="h-5 w-5 text-emerald-500" />
-                          : <TrendingDown className="h-5 w-5 text-red-500" />
+                          ? <TrendingUp className="h-5 w-5 text-foreground" />
+                          : <TrendingDown className="h-5 w-5 text-foreground" />
                         }
                       </div>
                       <div>
@@ -187,9 +212,7 @@ export function RecurringTransactionsList({ recurring, accounts, categories }: P
 
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <p className={`font-bold ${
-                          item.type === 'pemasukan' ? 'text-emerald-500' : 'text-red-500'
-                        }`}>
+                        <p className="font-bold text-foreground">
                           {item.type === 'pemasukan' ? '+' : '-'}
                           {formatCurrency(Number(item.amount))}
                         </p>
@@ -219,7 +242,7 @@ export function RecurringTransactionsList({ recurring, accounts, categories }: P
                           onClick={() => handleToggle(item.id, item.isActive)}
                           disabled={isPending}
                         >
-                          <Pause className="h-4 w-4 text-amber-500" />
+                          <Pause className="h-4 w-4 text-foreground" />
                         </Button>
                         <Button 
                           size="icon" 
@@ -227,7 +250,7 @@ export function RecurringTransactionsList({ recurring, accounts, categories }: P
                           onClick={() => setDeleteConfirm(item.id)}
                           disabled={isPending}
                         >
-                          <Trash2 className="h-4 w-4 text-red-500" />
+                          <Trash2 className="h-4 w-4 text-foreground" />
                         </Button>
                       </div>
                     </div>
@@ -286,7 +309,7 @@ export function RecurringTransactionsList({ recurring, accounts, categories }: P
                         onClick={() => handleToggle(item.id, item.isActive)}
                         disabled={isPending}
                       >
-                        <Play className="h-4 w-4 text-emerald-500" />
+                        <Play className="h-4 w-4 text-foreground" />
                       </Button>
                       <Button 
                         size="icon" 
@@ -294,7 +317,7 @@ export function RecurringTransactionsList({ recurring, accounts, categories }: P
                         onClick={() => setDeleteConfirm(item.id)}
                         disabled={isPending}
                       >
-                        <Trash2 className="h-4 w-4 text-red-500" />
+                        <Trash2 className="h-4 w-4 text-foreground" />
                       </Button>
                     </div>
                   </div>
@@ -349,8 +372,9 @@ export function RecurringTransactionsList({ recurring, accounts, categories }: P
             <label className="block text-sm font-medium mb-2">Jenis</label>
             <select 
               name="type" 
-              defaultValue={editingItem?.type || 'pengeluaran'}
-              className="w-full p-3 rounded-xl bg-muted border border-white/10 text-foreground"
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value as 'pemasukan' | 'pengeluaran')}
+              className="w-full p-3 rounded-xl bg-muted border border-border text-foreground"
               required
             >
               <option value="pemasukan">Pemasukan</option>
@@ -360,14 +384,14 @@ export function RecurringTransactionsList({ recurring, accounts, categories }: P
 
           <div>
             <label className="block text-sm font-medium mb-2">Jumlah</label>
+            <input type="hidden" name="amount" value={amountRaw} />
             <input
-              type="number"
-              name="amount"
-              defaultValue={editingItem?.amount || ''}
+              type="text"
+              value={amountDisplay}
+              onChange={handleAmountChange}
               placeholder="0"
-              className="w-full p-3 rounded-xl bg-muted border border-white/10 text-foreground"
+              className="w-full p-3 rounded-xl bg-muted border border-border text-foreground"
               required
-              min="1"
             />
           </div>
 
@@ -378,7 +402,7 @@ export function RecurringTransactionsList({ recurring, accounts, categories }: P
               name="description"
               defaultValue={editingItem?.description || ''}
               placeholder="Gaji bulanan, Netflix, dll"
-              className="w-full p-3 rounded-xl bg-muted border border-white/10 text-foreground"
+              className="w-full p-3 rounded-xl bg-muted border border-border text-foreground"
             />
           </div>
 
@@ -387,7 +411,7 @@ export function RecurringTransactionsList({ recurring, accounts, categories }: P
             <select 
               name="accountId" 
               defaultValue={editingItem?.account?.id || ''}
-              className="w-full p-3 rounded-xl bg-muted border border-white/10 text-foreground"
+              className="w-full p-3 rounded-xl bg-muted border border-border text-foreground"
               required
             >
               <option value="">Pilih dompet</option>
@@ -402,10 +426,10 @@ export function RecurringTransactionsList({ recurring, accounts, categories }: P
             <select 
               name="categoryId" 
               defaultValue={editingItem?.category?.id || ''}
-              className="w-full p-3 rounded-xl bg-muted border border-white/10 text-foreground"
+              className="w-full p-3 rounded-xl bg-muted border border-border text-foreground"
             >
               <option value="">Pilih kategori</option>
-              {categories.map(cat => (
+              {filteredCategories.map(cat => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </select>
@@ -416,7 +440,7 @@ export function RecurringTransactionsList({ recurring, accounts, categories }: P
             <select 
               name="frequency" 
               defaultValue={editingItem?.frequency || 'bulanan'}
-              className="w-full p-3 rounded-xl bg-muted border border-white/10 text-foreground"
+              className="w-full p-3 rounded-xl bg-muted border border-border text-foreground"
               required
             >
               <option value="harian">Harian</option>
@@ -432,7 +456,7 @@ export function RecurringTransactionsList({ recurring, accounts, categories }: P
               type="date"
               name="nextDate"
               defaultValue={editingItem?.nextDate ? new Date(editingItem.nextDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
-              className="w-full p-3 rounded-xl bg-muted border border-white/10 text-foreground"
+              className="w-full p-3 rounded-xl bg-muted border border-border text-foreground"
               required
             />
           </div>

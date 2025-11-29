@@ -128,8 +128,8 @@ export default async function RecurringPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <RefreshCw className="h-5 w-5 text-primary" />
+              <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center">
+                <RefreshCw className="h-5 w-5 text-foreground" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Aktif</p>
@@ -142,13 +142,13 @@ export default async function RecurringPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-emerald-500" />
+              <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center">
+                <TrendingUp className="h-5 w-5 text-foreground" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Pemasukan/Bulan</p>
-                <p className="text-xl font-bold text-emerald-500">
-                  {formatCurrency(data.estimatedMonthlyIncome)}
+                <p className="text-xl font-bold">
+                  +{formatCurrency(data.estimatedMonthlyIncome)}
                 </p>
               </div>
             </div>
@@ -158,13 +158,13 @@ export default async function RecurringPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-red-500/10 flex items-center justify-center">
-                <TrendingDown className="h-5 w-5 text-red-500" />
+              <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center">
+                <TrendingDown className="h-5 w-5 text-foreground" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Pengeluaran/Bulan</p>
-                <p className="text-xl font-bold text-red-500">
-                  {formatCurrency(data.estimatedMonthlyExpense)}
+                <p className="text-xl font-bold">
+                  -{formatCurrency(data.estimatedMonthlyExpense)}
                 </p>
               </div>
             </div>
@@ -174,16 +174,13 @@ export default async function RecurringPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                <Calendar className="h-5 w-5 text-blue-500" />
+              <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center">
+                <Calendar className="h-5 w-5 text-foreground" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Net/Bulan</p>
-                <p className={`text-xl font-bold ${
-                  data.estimatedMonthlyIncome - data.estimatedMonthlyExpense >= 0 
-                    ? 'text-emerald-500' 
-                    : 'text-red-500'
-                }`}>
+                <p className="text-xl font-bold">
+                  {data.estimatedMonthlyIncome - data.estimatedMonthlyExpense >= 0 ? '+' : ''}
                   {formatCurrency(data.estimatedMonthlyIncome - data.estimatedMonthlyExpense)}
                 </p>
               </div>

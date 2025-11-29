@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { FormattedNumberInput } from '@/components/ui/formatted-number-input';
 import { Modal } from '@/components/ui/modal';
 import { Select } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
@@ -228,14 +229,14 @@ export function GoalsWidget({ goals, onUpdate }: GoalsWidgetProps) {
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
                           onClick={() => openSimulation(goal)}
-                          className="p-1.5 rounded hover:bg-primary/20 text-primary"
+                          className="p-1.5 rounded hover:bg-foreground/20 text-foreground"
                           title="Simulasi"
                         >
                           <Calculator className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(goal.id)}
-                          className="p-1.5 rounded hover:bg-red-500/20 text-red-500"
+                          className="p-1.5 rounded hover:bg-foreground/20 text-foreground"
                           title="Hapus"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -246,7 +247,7 @@ export function GoalsWidget({ goals, onUpdate }: GoalsWidgetProps) {
                     <Progress value={Math.min(progress, 100)} className="h-2 mb-2" />
                     
                     <div className="flex items-center justify-between text-xs">
-                      <span className={`font-medium ${progress >= 100 ? 'text-emerald-500' : 'text-muted-foreground'}`}>
+                      <span className="font-medium text-foreground">
                         {progress.toFixed(0)}%
                       </span>
                       {goal.deadline && (
@@ -298,7 +299,7 @@ export function GoalsWidget({ goals, onUpdate }: GoalsWidgetProps) {
                   onClick={() => handleCategorySelect(cat.id)}
                   className={`p-2 rounded-lg border text-center transition-colors ${
                     formData.category === cat.id
-                      ? 'border-primary bg-primary/10'
+                      ? 'border-foreground bg-foreground/10'
                       : 'border-border hover:bg-muted'
                   }`}
                 >
@@ -321,10 +322,9 @@ export function GoalsWidget({ goals, onUpdate }: GoalsWidgetProps) {
 
           <div>
             <label className="text-sm font-medium">Target (Rp)</label>
-            <Input
-              type="number"
+            <FormattedNumberInput
               value={formData.targetAmount}
-              onChange={(e) => setFormData(prev => ({ ...prev, targetAmount: e.target.value }))}
+              onChange={(val) => setFormData(prev => ({ ...prev, targetAmount: val }))}
               placeholder="0"
               required
             />
@@ -332,10 +332,9 @@ export function GoalsWidget({ goals, onUpdate }: GoalsWidgetProps) {
 
           <div>
             <label className="text-sm font-medium">Sudah Terkumpul (Rp)</label>
-            <Input
-              type="number"
+            <FormattedNumberInput
               value={formData.currentAmount}
-              onChange={(e) => setFormData(prev => ({ ...prev, currentAmount: e.target.value }))}
+              onChange={(val) => setFormData(prev => ({ ...prev, currentAmount: val }))}
               placeholder="0"
             />
           </div>
@@ -405,19 +404,18 @@ export function GoalsWidget({ goals, onUpdate }: GoalsWidgetProps) {
 
             <div>
               <label className="text-sm font-medium">Berapa yang bisa kamu nabung per hari?</label>
-              <Input
-                type="number"
+              <FormattedNumberInput
                 value={dailySavings}
-                onChange={(e) => setDailySavings(e.target.value)}
-                placeholder="Contoh: 50000"
+                onChange={(val) => setDailySavings(val)}
+                placeholder="50.000"
                 className="mt-1"
               />
             </div>
 
             {simulation && dailySavings && (
-              <div className="p-4 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 space-y-3">
+              <div className="p-4 rounded-xl bg-gradient-to-br from-foreground/10 to-foreground/5 border border-foreground/20 space-y-3">
                 <h4 className="font-medium flex items-center gap-2">
-                  <Calculator className="h-4 w-4 text-primary" />
+                  <Calculator className="h-4 w-4 text-foreground" />
                   Hasil Simulasi
                 </h4>
                 
@@ -452,7 +450,7 @@ export function GoalsWidget({ goals, onUpdate }: GoalsWidgetProps) {
                 </div>
 
                 {selectedGoal.deadline && (
-                  <div className={`p-2 rounded-lg ${simulation.isOnTrack ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'bg-red-500/10 text-red-600 dark:text-red-400'}`}>
+                  <div className="p-2 rounded-lg bg-foreground/10 text-foreground">
                     <p className="text-sm font-medium flex items-center gap-2">
                       {simulation.isOnTrack ? '✅' : '⚠️'}
                       {simulation.isOnTrack 

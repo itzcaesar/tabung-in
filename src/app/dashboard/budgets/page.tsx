@@ -8,16 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, PiggyBank, Target, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
 import Link from 'next/link';
-import { getMonthRange } from '@/lib/utils';
-
-function formatRupiah(amount: number): string {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
+import { getMonthRange, formatCurrency } from '@/lib/utils';
 
 export default async function BudgetsPage() {
   const session = await auth();
@@ -69,27 +60,27 @@ export default async function BudgetsPage() {
   const stats = [
     {
       label: 'Total Anggaran',
-      value: formatRupiah(totalBudget),
+      value: formatCurrency(totalBudget),
       icon: Target,
-      color: 'bg-blue-500/10 text-blue-500',
+      color: 'bg-foreground/10 text-foreground',
     },
     {
       label: 'Total Terpakai',
-      value: formatRupiah(totalSpent),
+      value: formatCurrency(totalSpent),
       icon: TrendingDown,
-      color: 'bg-red-500/10 text-red-500',
+      color: 'bg-foreground/10 text-foreground',
     },
     {
       label: 'Sisa Anggaran',
-      value: formatRupiah(remaining),
+      value: formatCurrency(remaining),
       icon: TrendingUp,
-      color: remaining >= 0 ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500',
+      color: 'bg-foreground/10 text-foreground',
     },
     {
       label: 'Perlu Perhatian',
       value: `${budgetsNearLimit + budgetsOverLimit} Anggaran`,
       icon: AlertTriangle,
-      color: budgetsOverLimit > 0 ? 'bg-red-500/10 text-red-500' : budgetsNearLimit > 0 ? 'bg-amber-500/10 text-amber-500' : 'bg-green-500/10 text-green-500',
+      color: 'bg-foreground/10 text-foreground',
     },
   ];
 

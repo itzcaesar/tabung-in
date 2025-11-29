@@ -29,10 +29,10 @@ const typeIcons = {
 };
 
 const typeColors = {
-  warning: 'text-amber-500 bg-amber-500/10',
-  success: 'text-emerald-500 bg-emerald-500/10',
-  tip: 'text-blue-500 bg-blue-500/10',
-  info: 'text-purple-500 bg-purple-500/10',
+  warning: 'text-foreground bg-foreground/10',
+  success: 'text-foreground bg-foreground/10',
+  tip: 'text-foreground bg-foreground/10',
+  info: 'text-foreground bg-foreground/10',
 };
 
 const categoryIcons = {

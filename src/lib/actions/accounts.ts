@@ -10,11 +10,11 @@ import { eq, and } from 'drizzle-orm';
 const accountSchema = z.object({
   name: z.string().min(1, 'Nama dompet wajib diisi'),
   type: z.enum(['rekening', 'emoney', 'tunai']),
-  provider: z.string().optional(),
+  provider: z.string().optional().nullable(),
   balance: z.coerce.number().default(0),
   currency: z.string().default('IDR'),
-  icon: z.string().optional(),
-  color: z.string().optional(),
+  icon: z.string().optional().nullable(),
+  color: z.string().optional().nullable(),
 });
 
 export type AccountState = {
@@ -54,14 +54,15 @@ export async function createAccount(
       provider: validatedFields.data.provider || null,
       balance: validatedFields.data.balance.toString(),
       currency: validatedFields.data.currency,
-      icon: validatedFields.data.icon,
-      color: validatedFields.data.color,
+      icon: validatedFields.data.icon || null,
+      color: validatedFields.data.color || null,
     });
 
     revalidatePath('/dashboard');
     revalidatePath('/dashboard/accounts');
     return { success: true, message: 'Dompet berhasil dibuat' };
-  } catch {
+  } catch (error) {
+    console.error('[createAccount] Error:', error);
     return { errors: { general: ['Gagal membuat dompet'] } };
   }
 }
@@ -73,14 +74,15 @@ export async function updateAccount(
 ): Promise<AccountState> {
   const session = await auth();
   if (!session?.user?.id) {
-    return { errors: { general: ['Unauthorized'] } };
+    return { errors: { general: ['Tidak terautentikasi'] } };
   }
 
   const validatedFields = accountSchema.safeParse({
     name: formData.get('name'),
     type: formData.get('type'),
+    provider: formData.get('provider') || undefined,
     balance: formData.get('balance') || 0,
-    currency: formData.get('currency') || 'USD',
+    currency: formData.get('currency') || 'IDR',
     icon: formData.get('icon'),
     color: formData.get('color'),
   });
@@ -93,17 +95,22 @@ export async function updateAccount(
     await db
       .update(accounts)
       .set({
-        ...validatedFields.data,
+        name: validatedFields.data.name,
+        type: validatedFields.data.type,
+        provider: validatedFields.data.provider || null,
         balance: validatedFields.data.balance.toString(),
+        currency: validatedFields.data.currency,
+        icon: validatedFields.data.icon,
+        color: validatedFields.data.color,
         updatedAt: new Date(),
       })
       .where(and(eq(accounts.id, id), eq(accounts.userId, session.user.id)));
 
     revalidatePath('/dashboard');
     revalidatePath('/dashboard/accounts');
-    return { success: true, message: 'Account updated successfully' };
+    return { success: true, message: 'Dompet berhasil diperbarui' };
   } catch {
-    return { errors: { general: ['Failed to update account'] } };
+    return { errors: { general: ['Gagal memperbarui dompet'] } };
   }
 }
 

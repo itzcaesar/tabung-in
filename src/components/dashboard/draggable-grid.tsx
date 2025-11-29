@@ -124,7 +124,7 @@ export function DraggableGrid({ widgets: initialWidgets, children }: DraggableGr
           <div className="flex items-center gap-2">
             {isEditing ? (
               <>
-                <div className="flex items-center gap-1.5 text-sm text-amber-600 dark:text-amber-500 bg-amber-500/10 px-3 py-1.5 rounded-lg">
+                <div className="flex items-center gap-1.5 text-sm text-foreground bg-foreground/10 px-3 py-1.5 rounded-lg">
                   <Unlock className="h-4 w-4" />
                   <span className="hidden sm:inline">Mode Edit - Drag & Resize Widget</span>
                   <span className="sm:hidden">Edit Mode</span>

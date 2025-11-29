@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import { createTransaction, type TransactionState } from '@/lib/actions/transactions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { FormattedNumberInput } from '@/components/ui/formatted-number-input';
 import { Select } from '@/components/ui/select';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { 
@@ -31,9 +32,9 @@ interface Account {
 }
 
 const transactionTypes = [
-  { value: 'pengeluaran', label: 'Pengeluaran', icon: TrendingDown, color: 'text-red-500', bg: 'bg-red-500/20' },
-  { value: 'pemasukan', label: 'Pemasukan', icon: TrendingUp, color: 'text-emerald-500', bg: 'bg-emerald-500/20' },
-  { value: 'transfer', label: 'Transfer', icon: ArrowLeftRight, color: 'text-blue-500', bg: 'bg-blue-500/20' },
+  { value: 'pengeluaran', label: 'Pengeluaran', icon: TrendingDown, color: 'text-foreground', bg: 'bg-foreground/20' },
+  { value: 'pemasukan', label: 'Pemasukan', icon: TrendingUp, color: 'text-foreground', bg: 'bg-foreground/20' },
+  { value: 'transfer', label: 'Transfer', icon: ArrowLeftRight, color: 'text-foreground', bg: 'bg-foreground/20' },
 ];
 
 function getAccountIcon(type: string) {
@@ -85,9 +86,12 @@ export default function NewTransactionPage() {
     }
   }, [session?.user?.id]);
 
-  if (state.success) {
-    router.push('/dashboard/transactions');
-  }
+  // Redirect on success - moved to useEffect to avoid setState during render
+  useEffect(() => {
+    if (state.success) {
+      router.push('/dashboard/transactions');
+    }
+  }, [state.success, router]);
 
   const selectedAccount = accounts.find(a => a.id === selectedAccountId);
 
@@ -112,7 +116,7 @@ export default function NewTransactionPage() {
         <CardContent>
           <form action={formAction} className="space-y-6">
             {state.errors?.general && (
-              <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-4 text-sm text-red-500">
+              <div className="rounded-xl bg-foreground/10 border border-foreground/20 p-4 text-sm text-foreground">
                 {state.errors.general.join(', ')}
               </div>
             )}
@@ -150,7 +154,7 @@ export default function NewTransactionPage() {
               </div>
               <input type="hidden" name="type" value={selectedType} />
               {state.errors?.type && (
-                <p className="text-sm text-red-500 mt-2">{state.errors.type.join(', ')}</p>
+                <p className="text-sm text-muted-foreground mt-2">{state.errors.type.join(', ')}</p>
               )}
             </div>
 
@@ -214,16 +218,14 @@ export default function NewTransactionPage() {
               )}
               <input type="hidden" name="accountId" value={selectedAccountId} />
               {state.errors?.accountId && (
-                <p className="text-sm text-red-500 mt-2">{state.errors.accountId.join(', ')}</p>
+                <p className="text-sm text-muted-foreground mt-2">{state.errors.accountId.join(', ')}</p>
               )}
             </div>
 
             {/* Amount */}
             <div>
-              <Input
+              <FormattedNumberInput
                 name="amount"
-                type="number"
-                step="1"
                 label="Jumlah (Rp)"
                 placeholder="0"
                 error={state.errors?.amount?.join(', ')}

@@ -11,7 +11,9 @@ const transactionSchema = z.object({
   accountId: z.string().uuid(),
   categoryId: z.string().uuid().optional().nullable(),
   type: z.enum(['pemasukan', 'pengeluaran', 'transfer']),
-  amount: z.coerce.number().positive('Jumlah harus lebih dari 0'),
+  amount: z.coerce.number()
+    .positive('Jumlah harus lebih dari 0')
+    .max(Number.MAX_SAFE_INTEGER, 'Jumlah terlalu besar'),
   description: z.string().optional(),
   date: z.coerce.date(),
 });
@@ -97,22 +99,80 @@ export async function updateTransaction(
     return { errors: validatedFields.error.flatten().fieldErrors };
   }
 
+  const { accountId, type, amount } = validatedFields.data;
+
   try {
+    // Fetch old transaction to reverse balance
+    const oldTransaction = await db.query.transactions.findFirst({
+      where: and(eq(transactions.id, id), eq(transactions.userId, session.user.id)),
+    });
+
+    if (!oldTransaction) {
+      return { errors: { general: ['Transaksi tidak ditemukan'] } };
+    }
+
+    const oldAmount = Number(oldTransaction.amount);
+    const oldAccountId = oldTransaction.accountId;
+    const oldType = oldTransaction.type;
+
+    // Calculate balance changes
+    // 1. Reverse old transaction effect on old account
+    const oldReversal = oldType === 'pemasukan' ? -oldAmount : oldAmount;
+    
+    // 2. Apply new transaction effect on new account
+    const newEffect = type === 'pemasukan' ? amount : -amount;
+
+    // Update transaction record
     await db
       .update(transactions)
       .set({
         ...validatedFields.data,
         categoryId: validatedFields.data.categoryId || null,
-        amount: validatedFields.data.amount.toString(),
+        amount: amount.toString(),
         updatedAt: new Date(),
       })
       .where(and(eq(transactions.id, id), eq(transactions.userId, session.user.id)));
 
+    // Update balances
+    if (oldAccountId === accountId) {
+      // Same account: apply net change
+      const netChange = newEffect + oldReversal;
+      if (netChange !== 0) {
+        await db
+          .update(accounts)
+          .set({
+            balance: sql`${accounts.balance} + ${netChange}`,
+            updatedAt: new Date(),
+          })
+          .where(eq(accounts.id, accountId));
+      }
+    } else {
+      // Different accounts: reverse old, apply new
+      // Reverse on old account
+      await db
+        .update(accounts)
+        .set({
+          balance: sql`${accounts.balance} + ${oldReversal}`,
+          updatedAt: new Date(),
+        })
+        .where(eq(accounts.id, oldAccountId));
+
+      // Apply on new account
+      await db
+        .update(accounts)
+        .set({
+          balance: sql`${accounts.balance} + ${newEffect}`,
+          updatedAt: new Date(),
+        })
+        .where(eq(accounts.id, accountId));
+    }
+
     revalidatePath('/dashboard');
     revalidatePath('/dashboard/transactions');
-    return { success: true, message: 'Transaction updated successfully' };
+    revalidatePath('/dashboard/accounts');
+    return { success: true, message: 'Transaksi berhasil diperbarui' };
   } catch {
-    return { errors: { general: ['Failed to update transaction'] } };
+    return { errors: { general: ['Gagal memperbarui transaksi'] } };
   }
 }
 

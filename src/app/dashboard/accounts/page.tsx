@@ -4,11 +4,14 @@ import { db } from '@/lib/db';
 import { accounts } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { formatCurrency } from '@/lib/utils';
-import { Plus, CreditCard, Wallet, Banknote, Smartphone, TrendingUp } from 'lucide-react';
+import { Plus, Wallet, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
+import { AccountsList } from './accounts-list';
+
+// Force dynamic rendering to always fetch fresh data
+export const dynamic = 'force-dynamic';
 
 // E-Money providers with their colors and initials
 const emoneyProviders: Record<string, { name: string; color: string; initials: string; textColor: string }> = {
@@ -42,49 +45,6 @@ const bankProviders: Record<string, { name: string; color: string; initials: str
   btn: { name: 'BTN', color: '#F7941D', initials: 'BTN', textColor: '#FFFFFF' },
 };
 
-function getProviderInfo(type: string, provider?: string | null) {
-  if (type === 'emoney' && provider && emoneyProviders[provider]) {
-    return emoneyProviders[provider];
-  }
-  if (type === 'rekening' && provider && bankProviders[provider]) {
-    return bankProviders[provider];
-  }
-  return null;
-}
-
-function getAccountIcon(type: string, color: string) {
-  const style = { color };
-  switch (type) {
-    case 'rekening':
-      return <Banknote className="h-6 w-6" style={style} />;
-    case 'emoney':
-      return <Smartphone className="h-6 w-6" style={style} />;
-    case 'tunai':
-      return <Wallet className="h-6 w-6" style={style} />;
-    default:
-      return <CreditCard className="h-6 w-6" style={style} />;
-  }
-}
-
-function getTypeLabel(type: string, provider?: string | null) {
-  if (type === 'emoney' && provider && emoneyProviders[provider]) {
-    return emoneyProviders[provider].name;
-  }
-  if (type === 'rekening' && provider && bankProviders[provider]) {
-    return bankProviders[provider].name;
-  }
-  switch (type) {
-    case 'rekening':
-      return 'Rekening Bank';
-    case 'emoney':
-      return 'E-Money';
-    case 'tunai':
-      return 'Uang Tunai';
-    default:
-      return type;
-  }
-}
-
 export default async function AccountsPage() {
   const session = await auth();
   if (!session?.user?.id) {
@@ -99,11 +59,6 @@ export default async function AccountsPage() {
     (sum, acc) => sum + Number(acc.balance),
     0
   );
-
-  // Group accounts by type
-  const rekeningAccounts = userAccounts.filter(a => a.type === 'rekening');
-  const emoneyAccounts = userAccounts.filter(a => a.type === 'emoney');
-  const tunaiAccounts = userAccounts.filter(a => a.type === 'tunai');
 
   return (
     <div className="space-y-6 md:space-y-8">
@@ -145,52 +100,11 @@ export default async function AccountsPage() {
       </Card>
 
       {userAccounts.length > 0 ? (
-        <div className="space-y-6">
-          {/* Rekening Bank */}
-          {rekeningAccounts.length > 0 && (
-            <div>
-              <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                <Banknote className="h-5 w-5 text-muted-foreground" />
-                Rekening Bank
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {rekeningAccounts.map((account) => (
-                  <AccountCard key={account.id} account={account} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* E-Money */}
-          {emoneyAccounts.length > 0 && (
-            <div>
-              <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                <Smartphone className="h-5 w-5 text-muted-foreground" />
-                E-Money
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {emoneyAccounts.map((account) => (
-                  <AccountCard key={account.id} account={account} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Uang Tunai */}
-          {tunaiAccounts.length > 0 && (
-            <div>
-              <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                <Wallet className="h-5 w-5 text-muted-foreground" />
-                Uang Tunai
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {tunaiAccounts.map((account) => (
-                  <AccountCard key={account.id} account={account} />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+        <AccountsList 
+          accounts={userAccounts} 
+          emoneyProviders={emoneyProviders}
+          bankProviders={bankProviders}
+        />
       ) : (
         <Card>
           <CardContent className="py-16">
@@ -215,50 +129,5 @@ export default async function AccountsPage() {
         </Card>
       )}
     </div>
-  );
-}
-
-function AccountCard({ account }: { account: typeof accounts.$inferSelect }) {
-  const providerInfo = getProviderInfo(account.type, account.provider);
-  const color = account.color || providerInfo?.color || '#71717a';
-  const textColor = providerInfo?.textColor || '#FFFFFF';
-  const initials = providerInfo?.initials || account.name.substring(0, 2).toUpperCase();
-  
-  return (
-    <Card className="hover:border-foreground/20 transition-all hover:shadow-lg group">
-      <CardContent className="pt-6">
-        <div className="flex items-start justify-between mb-4">
-          {/* Brand Logo/Initials */}
-          <div
-            className="h-12 w-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 font-bold text-sm shadow-md"
-            style={{ 
-              backgroundColor: color,
-              color: textColor
-            }}
-          >
-            {initials}
-          </div>
-          <span
-            className={cn(
-              'text-xs font-medium px-2 py-1 rounded-full',
-              account.isActive
-                ? 'bg-emerald-500/20 text-emerald-500'
-                : 'bg-muted text-muted-foreground'
-            )}
-          >
-            {account.isActive ? 'Aktif' : 'Nonaktif'}
-          </span>
-        </div>
-        <h3 className="text-lg font-semibold text-foreground">
-          {account.name}
-        </h3>
-        <p className="text-muted-foreground text-sm mb-4">
-          {getTypeLabel(account.type, account.provider)}
-        </p>
-        <p className="text-2xl font-bold text-foreground">
-          {formatCurrency(Number(account.balance))}
-        </p>
-      </CardContent>
-    </Card>
   );
 }

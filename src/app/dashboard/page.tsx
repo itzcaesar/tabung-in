@@ -260,15 +260,15 @@ export default async function DashboardPage() {
             </p>
             <div className="flex items-center gap-4 mt-3">
               <div className="flex items-center gap-1.5">
-                <ArrowUpRight className="h-4 w-4 text-emerald-500" />
-                <span className="text-sm text-emerald-500 font-medium">
-                  {formatCurrency(data.monthlyIncome)}
+                <ArrowUpRight className="h-4 w-4 text-foreground" />
+                <span className="text-sm text-foreground font-medium">
+                  +{formatCurrency(data.monthlyIncome)}
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                <ArrowDownRight className="h-4 w-4 text-red-500" />
-                <span className="text-sm text-red-500 font-medium">
-                  {formatCurrency(data.monthlyExpenses)}
+                <ArrowDownRight className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground font-medium">
+                  -{formatCurrency(data.monthlyExpenses)}
                 </span>
               </div>
             </div>
@@ -295,45 +295,45 @@ export default async function DashboardPage() {
   // Stats Card Widget
   const statsCard = (
     <div className="grid grid-cols-3 gap-3 h-full">
-      <Card className="hover:border-emerald-500/30 transition-colors group h-full">
+      <Card className="hover:border-foreground/20 transition-colors group h-full">
         <CardContent className="p-4 h-full flex flex-col justify-center">
           <div className="flex items-center gap-2 mb-2">
-            <div className="h-8 w-8 rounded-lg bg-emerald-500/15 flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
-              <TrendingUp className="h-4 w-4 text-emerald-500" />
+            <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+              <TrendingUp className="h-4 w-4 text-foreground" />
             </div>
           </div>
           <p className="text-xs text-muted-foreground">Pemasukan</p>
-          <p className="text-lg font-bold text-emerald-500">
+          <p className="text-lg font-bold text-foreground">
             +{formatCurrency(data.monthlyIncome)}
           </p>
         </CardContent>
       </Card>
 
-      <Card className="hover:border-red-500/30 transition-colors group h-full">
+      <Card className="hover:border-foreground/20 transition-colors group h-full">
         <CardContent className="p-4 h-full flex flex-col justify-center">
           <div className="flex items-center gap-2 mb-2">
-            <div className="h-8 w-8 rounded-lg bg-red-500/15 flex items-center justify-center group-hover:bg-red-500/20 transition-colors">
-              <TrendingDown className="h-4 w-4 text-red-500" />
+            <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+              <TrendingDown className="h-4 w-4 text-foreground" />
             </div>
           </div>
           <p className="text-xs text-muted-foreground">Pengeluaran</p>
-          <p className="text-lg font-bold text-red-500">
+          <p className="text-lg font-bold text-foreground">
             -{formatCurrency(data.monthlyExpenses)}
           </p>
         </CardContent>
       </Card>
 
-      <Card className="hover:border-purple-500/30 transition-colors group h-full">
+      <Card className="hover:border-foreground/20 transition-colors group h-full">
         <CardContent className="p-4 h-full flex flex-col justify-center">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <div className="h-8 w-8 rounded-lg bg-purple-500/15 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
-                  <PiggyBank className="h-4 w-4 text-purple-500" />
+                <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+                  <PiggyBank className="h-4 w-4 text-foreground" />
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">Tabungan</p>
-              <p className={`text-lg font-bold ${savings >= 0 ? 'text-purple-500' : 'text-red-500'}`}>
+              <p className="text-lg font-bold text-foreground">
                 {savings >= 0 ? '+' : ''}{formatCurrency(savings)}
               </p>
             </div>

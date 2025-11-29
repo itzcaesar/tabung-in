@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { FormattedNumberInput } from '@/components/ui/formatted-number-input';
 import { Select } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 import { Modal } from '@/components/ui/modal';
@@ -288,10 +289,9 @@ export default function ReceiptsPage() {
                   </div>
                   <div>
                     <label className="text-sm text-muted-foreground">Total</label>
-                    <Input
-                      type="number"
-                      value={editedData.total}
-                      onChange={(e) => setEditedData(prev => ({ ...prev, total: Number(e.target.value) }))}
+                    <FormattedNumberInput
+                      value={String(editedData.total)}
+                      onChange={(val) => setEditedData(prev => ({ ...prev, total: Number(val) }))}
                       placeholder="Total tidak terdeteksi"
                     />
                   </div>

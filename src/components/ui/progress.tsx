@@ -21,9 +21,9 @@ export function Progress({
 
   const variantClasses = {
     default: 'bg-foreground',
-    success: 'bg-emerald-500',
-    warning: 'bg-amber-500',
-    danger: 'bg-red-500',
+    success: 'bg-foreground',
+    warning: 'bg-foreground/80',
+    danger: 'bg-foreground/60',
   };
 
   const sizeClasses = {

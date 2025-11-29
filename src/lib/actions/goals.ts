@@ -98,6 +98,16 @@ export async function addGoalProgress(id: string, amount: number) {
     return { success: false, error: 'Unauthorized' };
   }
 
+  // Validate amount
+  if (amount <= 0) {
+    return { success: false, error: 'Jumlah harus lebih dari 0' };
+  }
+
+  // Validate amount is not too large (prevent precision issues)
+  if (amount > Number.MAX_SAFE_INTEGER) {
+    return { success: false, error: 'Jumlah terlalu besar' };
+  }
+
   try {
     // Get current goal
     const goal = await db.query.goals.findFirst({
@@ -108,8 +118,15 @@ export async function addGoalProgress(id: string, amount: number) {
       return { success: false, error: 'Goal not found' };
     }
 
-    const newAmount = Number(goal.currentAmount) + amount;
-    const isComplete = newAmount >= Number(goal.targetAmount);
+    // Check if goal is already completed
+    if (goal.status === 'tercapai') {
+      return { success: false, error: 'Goal sudah tercapai' };
+    }
+
+    const currentAmount = Number(goal.currentAmount);
+    const targetAmount = Number(goal.targetAmount);
+    const newAmount = currentAmount + amount;
+    const isComplete = newAmount >= targetAmount;
 
     const [updatedGoal] = await db
       .update(goals)

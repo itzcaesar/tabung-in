@@ -26,9 +26,9 @@ export function BudgetCard({
   const isHealthy = percentage < 80;
 
   const StatusIcon = isOverBudget ? TrendingDown : isNearLimit ? AlertTriangle : CheckCircle;
-  const statusColor = isOverBudget ? 'text-red-500' : isNearLimit ? 'text-amber-500' : 'text-green-500';
-  const statusBg = isOverBudget ? 'bg-red-500/10' : isNearLimit ? 'bg-amber-500/10' : 'bg-green-500/10';
-  const borderColor = isOverBudget ? 'border-red-500/30' : isNearLimit ? 'border-amber-500/30' : 'border-green-500/30';
+  const statusColor = 'text-foreground';
+  const statusBg = 'bg-foreground/10';
+  const borderColor = 'border-foreground/20';
 
   return (
     <div
@@ -72,11 +72,7 @@ export function BudgetCard({
           value={spent} 
           max={limit} 
           size="lg" 
-          className={cn(
-            isOverBudget ? '[&>div]:bg-red-500' : 
-            isNearLimit ? '[&>div]:bg-amber-500' : 
-            '[&>div]:bg-green-500'
-          )} 
+          className="[&>div]:bg-foreground" 
         />
       </div>
 
@@ -90,10 +86,7 @@ export function BudgetCard({
           {percentage.toFixed(0)}% terpakai
         </span>
         <span
-          className={cn(
-            'text-sm font-medium',
-            isOverBudget ? 'text-red-500' : 'text-green-500'
-          )}
+          className="text-sm font-medium text-foreground"
         >
           {isOverBudget ? (
             <span className="flex items-center gap-1">

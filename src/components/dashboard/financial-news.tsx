@@ -61,8 +61,8 @@ export function FinancialNews({ initialNews = [] }: FinancialNewsProps) {
   const currentTip = financialTips[currentTipIndex];
 
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-3">
+    <Card className="h-full flex flex-col overflow-hidden">
+      <CardHeader className="pb-3 flex-shrink-0">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-semibold flex items-center gap-2">
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -73,7 +73,7 @@ export function FinancialNews({ initialNews = [] }: FinancialNewsProps) {
               onClick={() => setActiveTab('tips')}
               className={`px-2.5 py-1 text-xs rounded-full transition-colors ${
                 activeTab === 'tips'
-                  ? 'bg-primary text-primary-foreground'
+                  ? 'bg-foreground text-background'
                   : 'bg-muted hover:bg-muted/80 text-muted-foreground'
               }`}
             >
@@ -83,7 +83,7 @@ export function FinancialNews({ initialNews = [] }: FinancialNewsProps) {
               onClick={() => setActiveTab('news')}
               className={`px-2.5 py-1 text-xs rounded-full transition-colors ${
                 activeTab === 'news'
-                  ? 'bg-primary text-primary-foreground'
+                  ? 'bg-foreground text-background'
                   : 'bg-muted hover:bg-muted/80 text-muted-foreground'
               }`}
             >
@@ -92,14 +92,14 @@ export function FinancialNews({ initialNews = [] }: FinancialNewsProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 flex-1 overflow-y-auto overscroll-contain">
         {activeTab === 'tips' ? (
           <div className="space-y-3">
             {/* Featured Tip */}
-            <div className="p-4 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
+            <div className="p-4 rounded-xl bg-gradient-to-br from-foreground/10 to-foreground/5 border border-foreground/20">
               <div className="flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-primary/20 flex-shrink-0">
-                  <Lightbulb className="h-4 w-4 text-primary" />
+                <div className="p-2 rounded-lg bg-foreground/20 flex-shrink-0">
+                  <Lightbulb className="h-4 w-4 text-foreground" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm">{currentTip.title}</p>
@@ -116,8 +116,8 @@ export function FinancialNews({ initialNews = [] }: FinancialNewsProps) {
                     onClick={() => setCurrentTipIndex(index)}
                     className={`h-1.5 rounded-full transition-all ${
                       index === currentTipIndex
-                        ? 'w-4 bg-primary'
-                        : 'w-1.5 bg-primary/30 hover:bg-primary/50'
+                        ? 'w-4 bg-foreground'
+                        : 'w-1.5 bg-foreground/30 hover:bg-foreground/50'
                     }`}
                   />
                 ))}
@@ -140,7 +140,7 @@ export function FinancialNews({ initialNews = [] }: FinancialNewsProps) {
                     rel="noopener noreferrer"
                     className="block p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors group"
                   >
-                    <p className="text-sm font-medium line-clamp-2 group-hover:text-primary transition-colors">
+                    <p className="text-sm font-medium line-clamp-2 group-hover:text-foreground transition-colors">
                       {item.title}
                     </p>
                     <div className="flex items-center gap-2 mt-1.5">

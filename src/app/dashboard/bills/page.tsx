@@ -8,17 +8,23 @@ import { CalendarClock, Plus, AlertTriangle, CheckCircle2, Clock, XCircle } from
 import { formatCurrency } from '@/lib/utils';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { BillsList } from './bills-list';
 
 async function getBillsData(userId: string) {
   const now = new Date();
   const thirtyDaysFromNow = new Date();
   thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
-  const allBills = await db.query.bills.findMany({
-    where: eq(bills.userId, userId),
-    with: { category: true },
-    orderBy: [bills.dueDate],
-  });
+  const [allBills, allCategories] = await Promise.all([
+    db.query.bills.findMany({
+      where: eq(bills.userId, userId),
+      with: { category: true },
+      orderBy: [bills.dueDate],
+    }),
+    db.query.categories.findMany({
+      where: eq(categories.userId, userId),
+    }),
+  ]);
 
   const activeBills = allBills.filter(b => b.status === 'aktif');
   const upcomingBills = activeBills.filter(b => {
@@ -42,6 +48,7 @@ async function getBillsData(userId: string) {
     overdueBills,
     paidBills,
     totalMonthly,
+    categories: allCategories,
   };
 }
 
@@ -56,7 +63,7 @@ function getDaysUntilDue(dueDate: Date): number {
 function getStatusBadge(status: string, daysUntilDue: number) {
   if (status === 'lunas') {
     return (
-      <span className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-500">
+      <span className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-foreground/10 text-foreground">
         <CheckCircle2 className="h-3 w-3" />
         Lunas
       </span>
@@ -72,7 +79,7 @@ function getStatusBadge(status: string, daysUntilDue: number) {
   }
   if (daysUntilDue < 0) {
     return (
-      <span className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-red-500/10 text-red-500">
+      <span className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-foreground/10 text-foreground">
         <AlertTriangle className="h-3 w-3" />
         Terlambat {Math.abs(daysUntilDue)} hari
       </span>
@@ -80,14 +87,14 @@ function getStatusBadge(status: string, daysUntilDue: number) {
   }
   if (daysUntilDue <= 7) {
     return (
-      <span className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-amber-500/10 text-amber-500">
+      <span className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-foreground/10 text-foreground">
         <Clock className="h-3 w-3" />
         {daysUntilDue} hari lagi
       </span>
     );
   }
   return (
-    <span className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-blue-500/10 text-blue-500">
+    <span className="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
       <Clock className="h-3 w-3" />
       {daysUntilDue} hari lagi
     </span>
@@ -125,8 +132,8 @@ export default async function BillsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <CalendarClock className="h-5 w-5 text-primary" />
+              <div className="h-10 w-10 rounded-xl bg-foreground/10 flex items-center justify-center">
+                <CalendarClock className="h-5 w-5 text-foreground" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Tagihan</p>
@@ -139,8 +146,8 @@ export default async function BillsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                <Clock className="h-5 w-5 text-amber-500" />
+              <div className="h-10 w-10 rounded-xl bg-foreground/10 flex items-center justify-center">
+                <Clock className="h-5 w-5 text-foreground" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Akan Jatuh Tempo</p>
@@ -153,12 +160,12 @@ export default async function BillsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-red-500/10 flex items-center justify-center">
-                <AlertTriangle className="h-5 w-5 text-red-500" />
+              <div className="h-10 w-10 rounded-xl bg-foreground/10 flex items-center justify-center">
+                <AlertTriangle className="h-5 w-5 text-foreground" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Terlambat</p>
-                <p className="text-2xl font-bold text-red-500">{data.overdueBills.length}</p>
+                <p className="text-2xl font-bold">{data.overdueBills.length}</p>
               </div>
             </div>
           </CardContent>
@@ -167,8 +174,8 @@ export default async function BillsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                <CalendarClock className="h-5 w-5 text-blue-500" />
+              <div className="h-10 w-10 rounded-xl bg-foreground/10 flex items-center justify-center">
+                <CalendarClock className="h-5 w-5 text-foreground" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total/Bulan</p>
@@ -181,9 +188,9 @@ export default async function BillsPage() {
 
       {/* Overdue Bills Alert */}
       {data.overdueBills.length > 0 && (
-        <Card className="border-red-500/30 bg-red-500/5">
+        <Card className="border-foreground/30 bg-foreground/5">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base text-red-500 flex items-center gap-2">
+            <CardTitle className="text-base text-foreground flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" />
               Tagihan Terlambat
             </CardTitle>
@@ -215,94 +222,8 @@ export default async function BillsPage() {
       {/* Bills List */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold">Semua Tagihan</h2>
-        
-        {data.activeBills.length === 0 ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <CalendarClock className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
-              <p className="text-muted-foreground mb-4">Belum ada tagihan</p>
-              <Link href="/dashboard/bills/new">
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Tambah Tagihan
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-3">
-            {data.activeBills.map((bill) => {
-              const daysUntilDue = getDaysUntilDue(new Date(bill.dueDate));
-              
-              return (
-                <Card key={bill.id} className="hover:border-primary/30 transition-colors">
-                  <CardContent className="py-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div 
-                          className="h-12 w-12 rounded-xl flex items-center justify-center text-lg"
-                          style={{ 
-                            backgroundColor: bill.category?.color ? `${bill.category.color}20` : '#6366f120' 
-                          }}
-                        >
-                          {bill.category?.icon || '📄'}
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-foreground">{bill.name}</h3>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span>{bill.category?.name || 'Lainnya'}</span>
-                            <span>•</span>
-                            <span className="capitalize">{bill.frequency}</span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="text-right space-y-1">
-                        <p className="text-lg font-bold">{formatCurrency(Number(bill.amount))}</p>
-                        <div className="flex items-center justify-end gap-2">
-                          {getStatusBadge(bill.status, daysUntilDue)}
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(bill.dueDate).toLocaleDateString('id-ID', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        )}
+        <BillsList bills={data.allBills} categories={data.categories} />
       </div>
-
-      {/* Paid Bills */}
-      {data.paidBills.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-muted-foreground">Tagihan Lunas</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {data.paidBills.slice(0, 6).map((bill) => (
-              <Card key={bill.id} className="border-emerald-500/20 bg-emerald-500/5">
-                <CardContent className="py-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                      <div>
-                        <p className="font-medium text-foreground">{bill.name}</p>
-                        <p className="text-xs text-emerald-500">Lunas</p>
-                      </div>
-                    </div>
-                    <p className="font-bold">{formatCurrency(Number(bill.amount))}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

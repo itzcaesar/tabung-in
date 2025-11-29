@@ -47,20 +47,17 @@ export function TransactionList({
         >
           <div
             className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-xl',
-              transaction.type === 'pemasukan' && 'bg-emerald-500/20',
-              transaction.type === 'pengeluaran' && 'bg-red-500/20',
-              transaction.type === 'transfer' && 'bg-blue-500/20'
+              'flex h-10 w-10 items-center justify-center rounded-xl bg-foreground/10'
             )}
           >
             {transaction.type === 'pemasukan' && (
-              <ArrowDownLeft className="h-5 w-5 text-emerald-500" />
+              <ArrowDownLeft className="h-5 w-5 text-foreground" />
             )}
             {transaction.type === 'pengeluaran' && (
-              <ArrowUpRight className="h-5 w-5 text-red-500" />
+              <ArrowUpRight className="h-5 w-5 text-foreground" />
             )}
             {transaction.type === 'transfer' && (
-              <ArrowLeftRight className="h-5 w-5 text-blue-500" />
+              <ArrowLeftRight className="h-5 w-5 text-foreground" />
             )}
           </div>
 
@@ -80,10 +77,7 @@ export function TransactionList({
 
           <p
             className={cn(
-              'text-lg font-semibold',
-              transaction.type === 'pemasukan' && 'text-emerald-500',
-              transaction.type === 'pengeluaran' && 'text-red-500',
-              transaction.type === 'transfer' && 'text-blue-500'
+              'text-lg font-semibold text-foreground'
             )}
           >
             {transaction.type === 'pemasukan' ? '+' : transaction.type === 'pengeluaran' ? '-' : ''}

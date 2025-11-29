@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { FormattedNumberInput } from '@/components/ui/formatted-number-input';
 import { Select } from '@/components/ui/select';
 import { ArrowLeft, Target, Calculator, Sparkles } from 'lucide-react';
 import Link from 'next/link';
@@ -184,27 +185,20 @@ export default function NewGoalPage() {
           <CardContent className="space-y-4">
             <div>
               <label className="text-sm font-medium mb-2 block">Target Jumlah (Rp)</label>
-              <Input
-                type="number"
-                placeholder="15000000"
+              <FormattedNumberInput
+                placeholder="15.000.000"
                 value={formData.targetAmount}
-                onChange={(e) => setFormData(prev => ({ ...prev, targetAmount: e.target.value }))}
+                onChange={(val) => setFormData(prev => ({ ...prev, targetAmount: val }))}
                 required
               />
-              {formData.targetAmount && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  {formatCurrency(parseFloat(formData.targetAmount) || 0)}
-                </p>
-              )}
             </div>
 
             <div>
               <label className="text-sm font-medium mb-2 block">Jumlah Terkumpul Saat Ini (Rp)</label>
-              <Input
-                type="number"
+              <FormattedNumberInput
                 placeholder="0"
                 value={formData.currentAmount}
-                onChange={(e) => setFormData(prev => ({ ...prev, currentAmount: e.target.value }))}
+                onChange={(val) => setFormData(prev => ({ ...prev, currentAmount: val }))}
               />
             </div>
 
@@ -219,11 +213,11 @@ export default function NewGoalPage() {
             </div>
 
             {requiredDaily !== null && requiredDaily > 0 && (
-              <div className="p-4 bg-primary/10 rounded-xl border border-primary/20">
+              <div className="p-4 bg-foreground/10 rounded-xl border border-foreground/20">
                 <p className="text-sm text-muted-foreground mb-1">
                   Untuk mencapai target tepat waktu:
                 </p>
-                <p className="text-lg font-bold text-primary">
+                <p className="text-lg font-bold text-foreground">
                   Nabung {formatCurrency(requiredDaily)}/hari
                 </p>
               </div>
@@ -245,11 +239,10 @@ export default function NewGoalPage() {
                 Jika nabung per hari (Rp)
               </label>
               <div className="flex gap-2">
-                <Input
-                  type="number"
-                  placeholder="50000"
+                <FormattedNumberInput
+                  placeholder="50.000"
                   value={dailySavings}
-                  onChange={(e) => setDailySavings(e.target.value)}
+                  onChange={(val) => setDailySavings(val)}
                 />
                 <Button type="button" variant="outline" onClick={handleSimulate}>
                   Hitung
@@ -276,11 +269,7 @@ export default function NewGoalPage() {
                   </span>
                 </div>
                 {formData.deadline && (
-                  <div className={`flex justify-between p-2 rounded-lg ${
-                    simulation.isOnTrack 
-                      ? 'bg-emerald-500/10 text-emerald-500' 
-                      : 'bg-red-500/10 text-red-500'
-                  }`}>
+                  <div className="flex justify-between p-2 rounded-lg bg-foreground/10 text-foreground">
                     <span className="text-sm">Status:</span>
                     <span className="font-medium">
                       {simulation.isOnTrack ? '✓ Tepat Waktu' : '✗ Melewati Deadline'}
@@ -293,7 +282,7 @@ export default function NewGoalPage() {
         </Card>
 
         {error && (
-          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-sm">
+          <div className="p-4 bg-foreground/10 border border-foreground/20 rounded-xl text-foreground text-sm">
             {error}
           </div>
         )}

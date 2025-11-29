@@ -80,12 +80,12 @@ export default async function TransactionsPage() {
         <Card className="hover:border-foreground/20 transition-colors">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="h-10 w-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-emerald-500" />
+              <div className="h-10 w-10 rounded-xl bg-foreground/15 flex items-center justify-center">
+                <TrendingUp className="h-5 w-5 text-foreground" />
               </div>
               <span className="text-muted-foreground text-sm">Pemasukan</span>
             </div>
-            <p className="text-xl font-bold text-emerald-500">
+            <p className="text-xl font-bold text-foreground">
               +{formatCurrency(pemasukan?.total || 0)}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
@@ -97,12 +97,12 @@ export default async function TransactionsPage() {
         <Card className="hover:border-foreground/20 transition-colors">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="h-10 w-10 rounded-xl bg-red-500/20 flex items-center justify-center">
-                <TrendingDown className="h-5 w-5 text-red-500" />
+              <div className="h-10 w-10 rounded-xl bg-foreground/15 flex items-center justify-center">
+                <TrendingDown className="h-5 w-5 text-foreground" />
               </div>
               <span className="text-muted-foreground text-sm">Pengeluaran</span>
             </div>
-            <p className="text-xl font-bold text-red-500">
+            <p className="text-xl font-bold text-foreground">
               -{formatCurrency(pengeluaran?.total || 0)}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
@@ -114,12 +114,12 @@ export default async function TransactionsPage() {
         <Card className="hover:border-foreground/20 transition-colors">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="h-10 w-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
-                <ArrowLeftRight className="h-5 w-5 text-blue-500" />
+              <div className="h-10 w-10 rounded-xl bg-foreground/15 flex items-center justify-center">
+                <ArrowLeftRight className="h-5 w-5 text-foreground" />
               </div>
               <span className="text-muted-foreground text-sm">Selisih</span>
             </div>
-            <p className={`text-xl font-bold ${(pemasukan?.total || 0) - (pengeluaran?.total || 0) >= 0 ? 'text-blue-500' : 'text-red-500'}`}>
+            <p className="text-xl font-bold text-foreground">
               {formatCurrency((pemasukan?.total || 0) - (pengeluaran?.total || 0))}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
@@ -131,8 +131,8 @@ export default async function TransactionsPage() {
         <Card className="hover:border-foreground/20 transition-colors">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="h-10 w-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
-                <Receipt className="h-5 w-5 text-purple-500" />
+              <div className="h-10 w-10 rounded-xl bg-foreground/15 flex items-center justify-center">
+                <Receipt className="h-5 w-5 text-foreground" />
               </div>
               <span className="text-muted-foreground text-sm">Total</span>
             </div>

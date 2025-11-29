@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { FormattedNumberInput } from '@/components/ui/formatted-number-input';
 import { Modal } from '@/components/ui/modal';
 import { Select } from '@/components/ui/select';
 import { 
@@ -191,9 +192,9 @@ export function BillsWidget({ bills, onUpdate }: BillsWidgetProps) {
             <div className="space-y-2">
               {/* Overdue Alert */}
               {overdueBills.length > 0 && (
-                <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center gap-2 mb-3">
-                  <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0" />
-                  <span className="text-xs text-red-500 font-medium">
+                <div className="p-2 rounded-lg bg-foreground/10 border border-foreground/20 flex items-center gap-2 mb-3">
+                  <AlertCircle className="h-4 w-4 text-foreground flex-shrink-0" />
+                  <span className="text-xs text-foreground font-medium">
                     {overdueBills.length} tagihan terlambat
                   </span>
                 </div>
@@ -210,9 +211,9 @@ export function BillsWidget({ bills, onUpdate }: BillsWidgetProps) {
                     key={bill.id}
                     className={`p-3 rounded-xl transition-colors group ${
                       isOverdue 
-                        ? 'bg-red-500/10 border border-red-500/20' 
+                        ? 'bg-foreground/10 border border-foreground/20' 
                         : isUrgent
-                        ? 'bg-yellow-500/10 border border-yellow-500/20'
+                        ? 'bg-muted border border-muted-foreground/20'
                         : 'bg-muted/50 hover:bg-muted'
                     }`}
                   >
@@ -227,9 +228,7 @@ export function BillsWidget({ bills, onUpdate }: BillsWidgetProps) {
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm truncate">{bill.name}</p>
                           <div className="flex items-center gap-2 mt-0.5">
-                            <span className={`text-xs flex items-center gap-1 ${
-                              isOverdue ? 'text-red-500' : isUrgent ? 'text-yellow-600 dark:text-yellow-500' : 'text-muted-foreground'
-                            }`}>
+                            <span className="text-xs flex items-center gap-1 text-muted-foreground">
                               {isOverdue ? <AlertCircle className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
                               {formatDueDate(bill.dueDate)}
                             </span>
@@ -241,14 +240,14 @@ export function BillsWidget({ bills, onUpdate }: BillsWidgetProps) {
                         <div className="flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => handleMarkPaid(bill.id)}
-                            className="p-1 rounded hover:bg-emerald-500/20 text-emerald-500"
+                            className="p-1 rounded hover:bg-foreground/20 text-foreground"
                             title="Tandai Lunas"
                           >
                             <CheckCircle2 className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(bill.id)}
-                            className="p-1 rounded hover:bg-red-500/20 text-red-500"
+                            className="p-1 rounded hover:bg-foreground/20 text-foreground"
                             title="Hapus"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -289,7 +288,7 @@ export function BillsWidget({ bills, onUpdate }: BillsWidgetProps) {
                   onClick={() => handleCategorySelect(cat.id)}
                   className={`p-2 rounded-lg border text-center transition-colors ${
                     formData.categoryId === cat.id
-                      ? 'border-primary bg-primary/10'
+                      ? 'border-foreground bg-foreground/10'
                       : 'border-border hover:bg-muted'
                   }`}
                 >
@@ -312,10 +311,9 @@ export function BillsWidget({ bills, onUpdate }: BillsWidgetProps) {
 
           <div>
             <label className="text-sm font-medium">Jumlah (Rp)</label>
-            <Input
-              type="number"
+            <FormattedNumberInput
               value={formData.amount}
-              onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
+              onChange={(val) => setFormData(prev => ({ ...prev, amount: val }))}
               placeholder="0"
               required
             />

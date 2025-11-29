@@ -41,13 +41,13 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
       />
       <div
         className={cn(
-          'relative z-10 w-full max-w-lg mx-4 bg-slate-900/95 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl',
+          'relative z-10 w-full max-w-lg mx-4 bg-background backdrop-blur-xl rounded-2xl border border-border shadow-2xl',
           'animate-in fade-in zoom-in-95 duration-200',
           className
         )}
       >
-        <div className="flex items-center justify-between p-6 border-b border-white/10">
-          {title && <h2 className="text-xl font-semibold text-white">{title}</h2>}
+        <div className="flex items-center justify-between p-6 border-b border-border">
+          {title && <h2 className="text-xl font-semibold text-foreground">{title}</h2>}
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-5 w-5" />
           </Button>

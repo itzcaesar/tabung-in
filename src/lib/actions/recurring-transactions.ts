@@ -11,7 +11,9 @@ const recurringTransactionSchema = z.object({
   accountId: z.string().uuid(),
   categoryId: z.string().uuid().optional().nullable(),
   type: z.enum(['pemasukan', 'pengeluaran']),
-  amount: z.coerce.number().positive('Jumlah harus lebih dari 0'),
+  amount: z.coerce.number()
+    .positive('Jumlah harus lebih dari 0')
+    .max(Number.MAX_SAFE_INTEGER, 'Jumlah terlalu besar'),
   description: z.string().optional(),
   frequency: z.enum(['harian', 'mingguan', 'bulanan', 'tahunan']),
   nextDate: z.coerce.date(),

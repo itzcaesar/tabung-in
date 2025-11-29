@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { FormattedNumberInput } from '@/components/ui/formatted-number-input';
 import { Select } from '@/components/ui/select';
 import { ArrowLeft, CalendarClock, Receipt, Bell } from 'lucide-react';
 import Link from 'next/link';
@@ -130,18 +131,12 @@ export default function NewBillPage() {
 
             <div>
               <label className="text-sm font-medium mb-2 block">Jumlah (Rp)</label>
-              <Input
-                type="number"
-                placeholder="500000"
+              <FormattedNumberInput
+                placeholder="500.000"
                 value={formData.amount}
-                onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
+                onChange={(val) => setFormData(prev => ({ ...prev, amount: val }))}
                 required
               />
-              {formData.amount && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  {formatCurrency(parseFloat(formData.amount) || 0)}
-                </p>
-              )}
             </div>
           </CardContent>
         </Card>

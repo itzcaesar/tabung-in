@@ -6,9 +6,11 @@ import { useRouter } from 'next/navigation';
 import { createBudget, type BudgetState } from '@/lib/actions/budgets';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { FormattedNumberInput } from '@/components/ui/formatted-number-input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Calendar, Check, Target, AlertTriangle, PiggyBank } from 'lucide-react';
 import Link from 'next/link';
+import { formatCurrency } from '@/lib/utils';
 
 interface Category {
   id: string;
@@ -26,20 +28,11 @@ const periods = [
 ];
 
 const alertThresholds = [
-  { value: 50, label: '50%', color: 'bg-green-500/10 text-green-500 border-green-500/20' },
-  { value: 70, label: '70%', color: 'bg-amber-500/10 text-amber-500 border-amber-500/20' },
-  { value: 80, label: '80%', color: 'bg-orange-500/10 text-orange-500 border-orange-500/20' },
-  { value: 90, label: '90%', color: 'bg-red-500/10 text-red-500 border-red-500/20' },
+  { value: 50, label: '50%', color: 'bg-muted text-muted-foreground border-muted-foreground/20' },
+  { value: 70, label: '70%', color: 'bg-foreground/10 text-foreground border-foreground/20' },
+  { value: 80, label: '80%', color: 'bg-foreground/10 text-foreground border-foreground/20' },
+  { value: 90, label: '90%', color: 'bg-foreground/15 text-foreground border-foreground/30' },
 ];
-
-function formatRupiah(amount: number): string {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
 
 export default function NewBudgetPage() {
   const router = useRouter();
@@ -112,28 +105,14 @@ export default function NewBudgetPage() {
               <label className="block text-sm font-medium text-foreground mb-2">
                 Jumlah Anggaran
               </label>
-              <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                  Rp
-                </span>
-                <input
-                  type="text"
-                  value={amount}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/[^0-9]/g, '');
-                    setAmount(value);
-                  }}
-                  placeholder="0"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
-                  required
-                />
-                <input type="hidden" name="amount" value={amount || '0'} />
-              </div>
-              {amount && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  {formatRupiah(parseInt(amount) || 0)}
-                </p>
-              )}
+              <FormattedNumberInput
+                name="amount"
+                placeholder="0"
+                value={amount}
+                onChange={(val) => setAmount(val)}
+                required
+                className="pl-10"
+              />
               {state.errors?.amount && (
                 <p className="text-sm text-red-400 mt-1">{state.errors.amount.join(', ')}</p>
               )}

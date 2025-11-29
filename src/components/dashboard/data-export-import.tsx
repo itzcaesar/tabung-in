@@ -129,11 +129,7 @@ export function DataExportImport() {
     <div className="space-y-6">
       {/* Message Banner */}
       {message && (
-        <div className={`flex items-center justify-between gap-3 p-4 rounded-xl border ${
-          message.type === 'success' 
-            ? 'bg-green-500/10 border-green-500/20 text-green-600 dark:text-green-400' 
-            : 'bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400'
-        }`}>
+        <div className="flex items-center justify-between gap-3 p-4 rounded-xl border bg-foreground/10 border-foreground/20 text-foreground">
           <div className="flex items-center gap-3">
             {message.type === 'success' ? (
               <CheckCircle2 className="h-5 w-5" />
@@ -162,7 +158,7 @@ export function DataExportImport() {
       <Card>
         <CardHeader className="border-b border-border pb-4">
           <CardTitle className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-green-500 text-white">
+            <div className="p-2 rounded-lg bg-foreground text-background">
               <Download className="h-5 w-5" />
             </div>
             <div>
@@ -181,11 +177,11 @@ export function DataExportImport() {
               disabled={exporting !== null}
               className="flex items-center gap-4 p-4 rounded-xl bg-muted border border-border hover:bg-muted/80 hover:border-foreground/20 transition-all text-left disabled:opacity-50"
             >
-              <div className="p-3 rounded-xl bg-blue-500/10">
+              <div className="p-3 rounded-xl bg-foreground/10">
                 {exporting === 'transactions' ? (
-                  <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />
+                  <Loader2 className="h-5 w-5 text-foreground animate-spin" />
                 ) : (
-                  <Receipt className="h-5 w-5 text-blue-500" />
+                  <Receipt className="h-5 w-5 text-foreground" />
                 )}
               </div>
               <div className="flex-1">
@@ -201,11 +197,11 @@ export function DataExportImport() {
               disabled={exporting !== null}
               className="flex items-center gap-4 p-4 rounded-xl bg-muted border border-border hover:bg-muted/80 hover:border-foreground/20 transition-all text-left disabled:opacity-50"
             >
-              <div className="p-3 rounded-xl bg-purple-500/10">
+              <div className="p-3 rounded-xl bg-foreground/10">
                 {exporting === 'accounts' ? (
-                  <Loader2 className="h-5 w-5 text-purple-500 animate-spin" />
+                  <Loader2 className="h-5 w-5 text-foreground animate-spin" />
                 ) : (
-                  <Wallet className="h-5 w-5 text-purple-500" />
+                  <Wallet className="h-5 w-5 text-foreground" />
                 )}
               </div>
               <div className="flex-1">
@@ -221,11 +217,11 @@ export function DataExportImport() {
               disabled={exporting !== null}
               className="flex items-center gap-4 p-4 rounded-xl bg-muted border border-border hover:bg-muted/80 hover:border-foreground/20 transition-all text-left disabled:opacity-50"
             >
-              <div className="p-3 rounded-xl bg-amber-500/10">
+              <div className="p-3 rounded-xl bg-foreground/10">
                 {exporting === 'budgets' ? (
-                  <Loader2 className="h-5 w-5 text-amber-500 animate-spin" />
+                  <Loader2 className="h-5 w-5 text-foreground animate-spin" />
                 ) : (
-                  <PiggyBank className="h-5 w-5 text-amber-500" />
+                  <PiggyBank className="h-5 w-5 text-foreground" />
                 )}
               </div>
               <div className="flex-1">
@@ -239,20 +235,20 @@ export function DataExportImport() {
             <button
               onClick={() => handleExport('all')}
               disabled={exporting !== null}
-              className="flex items-center gap-4 p-4 rounded-xl bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 hover:border-cyan-500/40 transition-all text-left disabled:opacity-50"
+              className="flex items-center gap-4 p-4 rounded-xl bg-foreground/10 border border-foreground/20 hover:border-foreground/40 transition-all text-left disabled:opacity-50"
             >
-              <div className="p-3 rounded-xl bg-cyan-500/20">
+              <div className="p-3 rounded-xl bg-foreground/20">
                 {exporting === 'all' ? (
-                  <Loader2 className="h-5 w-5 text-cyan-500 animate-spin" />
+                  <Loader2 className="h-5 w-5 text-foreground animate-spin" />
                 ) : (
-                  <Database className="h-5 w-5 text-cyan-500" />
+                  <Database className="h-5 w-5 text-foreground" />
                 )}
               </div>
               <div className="flex-1">
                 <p className="font-medium text-foreground">Semua Data</p>
                 <p className="text-sm text-muted-foreground">Backup lengkap (JSON)</p>
               </div>
-              <FileJson className="h-5 w-5 text-cyan-500" />
+              <FileJson className="h-5 w-5 text-foreground" />
             </button>
           </div>
         </CardContent>
@@ -262,7 +258,7 @@ export function DataExportImport() {
       <Card>
         <CardHeader className="border-b border-border pb-4">
           <CardTitle className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-500 text-white">
+            <div className="p-2 rounded-lg bg-foreground text-background">
               <Upload className="h-5 w-5" />
             </div>
             <div>
@@ -288,14 +284,14 @@ export function DataExportImport() {
           >
             {importing ? (
               <div className="flex flex-col items-center gap-3">
-                <Loader2 className="h-12 w-12 text-blue-500 animate-spin" />
+                <Loader2 className="h-12 w-12 text-foreground animate-spin" />
                 <p className="text-foreground font-medium">Mengimpor data...</p>
               </div>
             ) : (
               <>
                 <div className="flex justify-center mb-4">
-                  <div className="p-4 rounded-2xl bg-blue-500/10">
-                    <Upload className="h-8 w-8 text-blue-500" />
+                  <div className="p-4 rounded-2xl bg-foreground/10">
+                    <Upload className="h-8 w-8 text-foreground" />
                   </div>
                 </div>
                 <p className="text-foreground font-medium mb-1">
@@ -309,14 +305,14 @@ export function DataExportImport() {
           </div>
 
           {/* Format Info */}
-          <div className="mt-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
-            <p className="text-sm text-amber-600 dark:text-amber-400">
+          <div className="mt-4 p-4 rounded-xl bg-muted border border-muted-foreground/20">
+            <p className="text-sm text-foreground">
               <strong>Format CSV yang didukung:</strong>
             </p>
-            <p className="text-xs text-amber-600/80 dark:text-amber-400/80 mt-1 font-mono">
+            <p className="text-xs text-muted-foreground mt-1 font-mono">
               Tanggal, Jenis, Kategori, Dompet, Jumlah, Keterangan
             </p>
-            <p className="text-xs text-amber-600/80 dark:text-amber-400/80 mt-2">
+            <p className="text-xs text-muted-foreground mt-2">
               • Tanggal: YYYY-MM-DD (contoh: 2024-12-31)<br/>
               • Jenis: pemasukan, pengeluaran, atau transfer<br/>
               • Nama Dompet harus sama persis dengan dompet yang sudah ada

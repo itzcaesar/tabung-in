@@ -116,29 +116,29 @@ export default async function ReportsPage() {
       label: 'Total Pemasukan',
       value: formatRupiah(income),
       icon: TrendingUp,
-      color: 'bg-green-500/10 text-green-500',
-      borderColor: 'border-green-500/20',
+      color: 'bg-foreground/10 text-foreground',
+      borderColor: 'border-foreground/20',
     },
     {
       label: 'Total Pengeluaran',
       value: formatRupiah(expenses),
       icon: TrendingDown,
-      color: 'bg-red-500/10 text-red-500',
-      borderColor: 'border-red-500/20',
+      color: 'bg-foreground/10 text-foreground',
+      borderColor: 'border-foreground/20',
     },
     {
       label: 'Total Transaksi',
       value: `${transactionCount} Transaksi`,
       icon: Calendar,
-      color: 'bg-blue-500/10 text-blue-500',
-      borderColor: 'border-blue-500/20',
+      color: 'bg-foreground/10 text-foreground',
+      borderColor: 'border-foreground/20',
     },
     {
       label: 'Rasio Tabungan',
       value: `${savingsRate.toFixed(1)}%`,
       icon: Target,
-      color: savingsRate >= 20 ? 'bg-green-500/10 text-green-500' : savingsRate >= 0 ? 'bg-amber-500/10 text-amber-500' : 'bg-red-500/10 text-red-500',
-      borderColor: savingsRate >= 20 ? 'border-green-500/20' : savingsRate >= 0 ? 'border-amber-500/20' : 'border-red-500/20',
+      color: 'bg-foreground/10 text-foreground',
+      borderColor: 'border-foreground/20',
     },
   ];
 
@@ -175,15 +175,15 @@ export default async function ReportsPage() {
 
       {/* Ringkasan Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="overflow-hidden bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20">
+        <Card className="overflow-hidden bg-foreground/5 border-foreground/20">
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-lg bg-green-500/20">
-                <PiggyBank className="h-5 w-5 text-green-500" />
+              <div className="p-2 rounded-lg bg-foreground/10">
+                <PiggyBank className="h-5 w-5 text-foreground" />
               </div>
-              <span className="text-sm text-green-600 dark:text-green-400 font-medium">Pendapatan Bersih</span>
+              <span className="text-sm text-muted-foreground font-medium">Pendapatan Bersih</span>
             </div>
-            <p className={`text-2xl md:text-3xl font-bold ${netIncome >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500'}`}>
+            <p className="text-2xl md:text-3xl font-bold text-foreground">
               {formatRupiah(netIncome)}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
@@ -192,13 +192,13 @@ export default async function ReportsPage() {
           </CardContent>
         </Card>
 
-        <Card className="overflow-hidden bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border-blue-500/20">
+        <Card className="overflow-hidden bg-foreground/5 border-foreground/20">
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-lg bg-blue-500/20">
-                <BarChart3 className="h-5 w-5 text-blue-500" />
+              <div className="p-2 rounded-lg bg-foreground/10">
+                <BarChart3 className="h-5 w-5 text-foreground" />
               </div>
-              <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">Rata-rata Harian</span>
+              <span className="text-sm text-muted-foreground font-medium">Rata-rata Harian</span>
             </div>
             <p className="text-2xl md:text-3xl font-bold text-foreground">
               {formatRupiah(dailyAverage)}
@@ -209,13 +209,13 @@ export default async function ReportsPage() {
           </CardContent>
         </Card>
 
-        <Card className="overflow-hidden bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/20">
+        <Card className="overflow-hidden bg-foreground/5 border-foreground/20">
           <CardContent className="p-5">
             <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-lg bg-amber-500/20">
-                <Wallet className="h-5 w-5 text-amber-500" />
+              <div className="p-2 rounded-lg bg-foreground/10">
+                <Wallet className="h-5 w-5 text-foreground" />
               </div>
-              <span className="text-sm text-amber-600 dark:text-amber-400 font-medium">Kategori Terbanyak</span>
+              <span className="text-sm text-muted-foreground font-medium">Kategori Terbanyak</span>
             </div>
             <p className="text-2xl md:text-3xl font-bold text-foreground truncate">
               {categoryBreakdown[0]?.name || '-'}

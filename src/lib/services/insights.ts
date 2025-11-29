@@ -1,6 +1,7 @@
 import { db } from '@/lib/db';
 import { transactions, budgets, goals, bills, accounts, categories } from '@/lib/db/schema';
 import { eq, and, gte, lte, sql, desc } from 'drizzle-orm';
+import { formatCurrency } from '@/lib/utils';
 
 export interface FinancialInsight {
   id: string;
@@ -230,7 +231,7 @@ export async function generateFinancialInsights(userId: string): Promise<Financi
           type: 'warning',
           category: 'budget',
           title: `Anggaran "${budget.name}" Hampir Habis`,
-          description: `Kamu sudah menggunakan ${percentUsed.toFixed(0)}% dari anggaran. Sisa: Rp ${(budgetAmount - spent).toLocaleString('id-ID')}.`,
+          description: `Kamu sudah menggunakan ${percentUsed.toFixed(0)}% dari anggaran. Sisa: ${formatCurrency(budgetAmount - spent)}.`,
           priority: 7,
         });
       }
@@ -255,7 +256,7 @@ export async function generateFinancialInsights(userId: string): Promise<Financi
             type: 'warning',
             category: 'savings',
             title: `Deadline "${goal.name}" Mendekat`,
-            description: `Kurang ${daysUntilDeadline} hari lagi. Kamu perlu menabung Rp ${monthlyNeeded.toLocaleString('id-ID')} untuk mencapai target.`,
+            description: `Kurang ${daysUntilDeadline} hari lagi. Kamu perlu menabung ${formatCurrency(Math.ceil(monthlyNeeded))} untuk mencapai target.`,
             priority: 8,
             actionable: {
               label: 'Update Goal',
@@ -302,7 +303,7 @@ export async function generateFinancialInsights(userId: string): Promise<Financi
           type: 'warning',
           category: 'bill',
           title: `Tagihan "${bill.name}" Segera Jatuh Tempo`,
-          description: `Jatuh tempo dalam ${daysUntilDue} hari. Siapkan pembayaran Rp ${Number(bill.amount).toLocaleString('id-ID')}.`,
+          description: `Jatuh tempo dalam ${daysUntilDue} hari. Siapkan pembayaran ${formatCurrency(Number(bill.amount))}.`,
           priority: 9,
           actionable: {
             label: 'Bayar Sekarang',

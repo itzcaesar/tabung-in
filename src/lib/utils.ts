@@ -45,5 +45,6 @@ export function getMonthRange(date: Date = new Date()): { start: Date; end: Date
 
 export function calculatePercentage(current: number, total: number): number {
   if (total === 0) return 0;
-  return Math.min((current / total) * 100, 100);
+  // Don't cap at 100% - allow showing over-budget percentages
+  return (current / total) * 100;
 }

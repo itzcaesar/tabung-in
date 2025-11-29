@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createAccount, type AccountState } from '@/lib/actions/accounts';
@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Building2, Smartphone, Wallet, Check } from 'lucide-react';
 import Link from 'next/link';
+import { formatCurrency } from '@/lib/utils';
 
 const walletTypes = [
   { 
@@ -16,21 +17,21 @@ const walletTypes = [
     label: 'Rekening Bank', 
     icon: Building2, 
     description: 'BCA, Mandiri, BNI, dll',
-    color: 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+    color: 'bg-foreground/10 text-foreground border-foreground/20'
   },
   { 
     value: 'emoney', 
     label: 'E-Money', 
     icon: Smartphone, 
     description: 'GoPay, OVO, DANA, dll',
-    color: 'bg-green-500/10 text-green-500 border-green-500/20'
+    color: 'bg-foreground/10 text-foreground border-foreground/20'
   },
   { 
     value: 'tunai', 
     label: 'Tunai', 
     icon: Wallet, 
     description: 'Uang cash di dompet',
-    color: 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+    color: 'bg-foreground/10 text-foreground border-foreground/20'
   },
 ];
 
@@ -66,15 +67,6 @@ const bankProviders = [
   { value: 'other_bank', label: 'Bank Lainnya', color: '#6B7280', logo: '', initials: '?' },
 ];
 
-function formatRupiah(amount: number): string {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
 export default function NewAccountPage() {
   const router = useRouter();
   const [walletType, setWalletType] = useState('');
@@ -86,9 +78,12 @@ export default function NewAccountPage() {
     {}
   );
 
-  if (state.success) {
-    router.push('/dashboard/accounts');
-  }
+  // Use useEffect to handle redirect after successful creation
+  useEffect(() => {
+    if (state.success) {
+      router.push('/dashboard/accounts');
+    }
+  }, [state.success, router]);
 
   const handleProviderSelect = (provider: { value: string; color: string }) => {
     setSelectedProvider(provider.value);
@@ -260,7 +255,7 @@ export default function NewAccountPage() {
               </div>
               {balance && (
                 <p className="text-sm text-muted-foreground mt-1">
-                  {formatRupiah(parseInt(balance) || 0)}
+                  {formatCurrency(parseInt(balance) || 0)}
                 </p>
               )}
               {state.errors?.balance && (
@@ -293,7 +288,7 @@ export default function NewAccountPage() {
                   </span>
                 </div>
                 <div className="text-2xl font-bold">
-                  {formatRupiah(parseInt(balance) || 0)}
+                  {formatCurrency(parseInt(balance) || 0)}
                 </div>
                 <div className="text-sm opacity-80 mt-1">
                   {selectedProvider ? 
