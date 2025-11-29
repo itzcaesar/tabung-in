@@ -10,15 +10,6 @@ import { CategoryBreakdown } from '@/components/dashboard/category-breakdown';
 import { formatCurrency } from '@/lib/utils';
 import { TrendingUp, TrendingDown, Calendar, Target, PiggyBank, BarChart3, Wallet } from 'lucide-react';
 
-function formatRupiah(amount: number): string {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
 export default async function ReportsPage() {
   const session = await auth();
   if (!session?.user?.id) {
@@ -114,14 +105,14 @@ export default async function ReportsPage() {
   const stats = [
     {
       label: 'Total Pemasukan',
-      value: formatRupiah(income),
+      value: formatCurrency(income),
       icon: TrendingUp,
       color: 'bg-foreground/10 text-foreground',
       borderColor: 'border-foreground/20',
     },
     {
       label: 'Total Pengeluaran',
-      value: formatRupiah(expenses),
+      value: formatCurrency(expenses),
       icon: TrendingDown,
       color: 'bg-foreground/10 text-foreground',
       borderColor: 'border-foreground/20',
@@ -184,7 +175,7 @@ export default async function ReportsPage() {
               <span className="text-sm text-muted-foreground font-medium">Pendapatan Bersih</span>
             </div>
             <p className="text-2xl md:text-3xl font-bold text-foreground">
-              {formatRupiah(netIncome)}
+              {formatCurrency(netIncome)}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
               {netIncome >= 0 ? 'Kamu menabung bulan ini! 🎉' : 'Pengeluaran melebihi pemasukan'}
@@ -201,7 +192,7 @@ export default async function ReportsPage() {
               <span className="text-sm text-muted-foreground font-medium">Rata-rata Harian</span>
             </div>
             <p className="text-2xl md:text-3xl font-bold text-foreground">
-              {formatRupiah(dailyAverage)}
+              {formatCurrency(dailyAverage)}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
               Pengeluaran per hari selama 30 hari
@@ -221,7 +212,7 @@ export default async function ReportsPage() {
               {categoryBreakdown[0]?.name || '-'}
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              {categoryBreakdown[0] ? formatRupiah(categoryBreakdown[0].value) : 'Belum ada pengeluaran'}
+              {categoryBreakdown[0] ? formatCurrency(categoryBreakdown[0].value) : 'Belum ada pengeluaran'}
             </p>
           </CardContent>
         </Card>
@@ -258,7 +249,7 @@ export default async function ReportsPage() {
                     </div>
                   </div>
                   <span className="font-semibold text-red-500">
-                    -{formatRupiah(Number(expense.amount))}
+                    -{formatCurrency(Number(expense.amount))}
                   </span>
                 </div>
               ))
@@ -298,7 +289,7 @@ export default async function ReportsPage() {
             )}
             <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
               <p className="text-sm text-blue-400">
-                📊 Pengeluaran harianmu rata-rata {formatRupiah(dailyAverage)}. Perhatikan pengeluaran di hari-hari tertentu.
+                📊 Pengeluaran harianmu rata-rata {formatCurrency(dailyAverage)}. Perhatikan pengeluaran di hari-hari tertentu.
               </p>
             </div>
           </div>

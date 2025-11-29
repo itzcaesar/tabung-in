@@ -9,10 +9,8 @@ export type WidgetId =
   | 'budgets'
   | 'bills'
   | 'goals'
-  | 'news'
   | 'categories'
-  | 'balance'
-  | 'insights';
+  | 'balance';
 
 export type WidgetSize = 'small' | 'medium' | 'large';
 
@@ -110,21 +108,13 @@ export const defaultWidgetConfig: DashboardWidgets = {
     enabled: true, 
     layout: { x: 4, y: 11, w: 4, h: 4, minW: 3, minH: 3 } 
   },
-  news: { 
-    enabled: true, 
-    layout: { x: 8, y: 11, w: 4, h: 4, minW: 3, minH: 3 } 
-  },
   transactions: { 
     enabled: true, 
-    layout: { x: 0, y: 15, w: 6, h: 4, minW: 4, minH: 3 } 
+    layout: { x: 8, y: 11, w: 4, h: 4, minW: 4, minH: 3 } 
   },
   categories: { 
     enabled: true, 
-    layout: { x: 6, y: 15, w: 6, h: 4, minW: 4, minH: 3 } 
-  },
-  insights: { 
-    enabled: true, 
-    layout: { x: 0, y: 19, w: 12, h: 4, minW: 4, minH: 3 } 
+    layout: { x: 0, y: 15, w: 12, h: 4, minW: 4, minH: 3 } 
   },
 };
 
@@ -170,19 +160,9 @@ export const widgetMetadata: Record<WidgetId, { name: string; description: strin
     description: 'Progress target tabungan',
     icon: '🎯'
   },
-  news: { 
-    name: 'Berita Finansial', 
-    description: 'Berita dan tips keuangan terkini',
-    icon: '📰'
-  },
   categories: { 
     name: 'Kategori Pengeluaran', 
     description: 'Breakdown pengeluaran per kategori',
     icon: '🏷️'
-  },
-  insights: { 
-    name: 'Wawasan Keuangan', 
-    description: 'Tips dan insight cerdas berdasarkan data keuanganmu',
-    icon: '✨'
   },
 };

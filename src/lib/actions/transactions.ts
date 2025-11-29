@@ -48,8 +48,18 @@ export async function createTransaction(
 
   const { accountId, categoryId, type, amount, description, date } = validatedFields.data;
 
+  // Validate account exists and belongs to user
+  const account = await db.query.accounts.findFirst({
+    where: and(eq(accounts.id, accountId), eq(accounts.userId, session.user.id)),
+  });
+
+  if (!account) {
+    return { errors: { general: ['Dompet tidak ditemukan'] } };
+  }
+
   try {
-    await db.insert(transactions).values({
+    // Insert transaction first
+    const [newTransaction] = await db.insert(transactions).values({
       userId: session.user.id,
       accountId,
       categoryId: categoryId || null,
@@ -57,22 +67,32 @@ export async function createTransaction(
       amount: amount.toString(),
       description,
       date,
-    });
+    }).returning();
 
+    // Calculate balance change
     const balanceChange = type === 'pemasukan' ? amount : -amount;
-    await db
-      .update(accounts)
-      .set({
-        balance: sql`${accounts.balance} + ${balanceChange}`,
-        updatedAt: new Date(),
-      })
-      .where(eq(accounts.id, accountId));
+    
+    try {
+      await db
+        .update(accounts)
+        .set({
+          balance: sql`${accounts.balance} + ${balanceChange}`,
+          updatedAt: new Date(),
+        })
+        .where(eq(accounts.id, accountId));
+    } catch (balanceError) {
+      // If balance update fails, rollback the transaction
+      console.error('Balance update failed, rolling back:', balanceError);
+      await db.delete(transactions).where(eq(transactions.id, newTransaction.id));
+      return { errors: { general: ['Gagal memperbarui saldo'] } };
+    }
 
     revalidatePath('/dashboard');
     revalidatePath('/dashboard/transactions');
-    return { success: true, message: 'Transaction created successfully' };
+    revalidatePath('/dashboard/accounts');
+    return { success: true, message: 'Transaksi berhasil dibuat' };
   } catch {
-    return { errors: { general: ['Failed to create transaction'] } };
+    return { errors: { general: ['Gagal membuat transaksi'] } };
   }
 }
 

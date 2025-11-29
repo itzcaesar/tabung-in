@@ -53,7 +53,8 @@ export default async function BudgetsPage() {
   const remaining = totalBudget - totalSpent;
   const budgetsOverLimit = budgetsWithSpending.filter(b => b.spent > Number(b.amount)).length;
   const budgetsNearLimit = budgetsWithSpending.filter(b => {
-    const percentage = (b.spent / Number(b.amount)) * 100;
+    const budgetAmount = Number(b.amount) || 1; // Prevent division by zero
+    const percentage = (b.spent / budgetAmount) * 100;
     return percentage >= 80 && percentage < 100;
   }).length;
 

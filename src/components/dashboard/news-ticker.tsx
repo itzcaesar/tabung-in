@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { TrendingUp, Lightbulb, ExternalLink } from 'lucide-react';
+import { TrendingUp, ExternalLink } from 'lucide-react';
 import { NewsItem } from '@/lib/types/news';
-import { financialTips } from '@/lib/constants/tips';
 
 interface NewsTickerProps {
   className?: string;
@@ -33,24 +32,14 @@ export function NewsTicker({ className = '' }: NewsTickerProps) {
     }
   };
 
-  // Combine news and tips for ticker
-  const tickerItems = [
-    // Tips first
-    ...financialTips.map((tip, i) => ({
-      id: `tip-${i}`,
-      type: 'tip' as const,
-      content: `${tip.title}: ${tip.description}`,
-      url: null,
-    })),
-    // Then news
-    ...news.map((item, i) => ({
-      id: `news-${i}`,
-      type: 'news' as const,
-      content: item.title,
-      url: item.url,
-      source: item.source,
-    })),
-  ];
+  // Only show news in ticker
+  const tickerItems = news.map((item, i) => ({
+    id: `news-${i}`,
+    type: 'news' as const,
+    content: item.title,
+    url: item.url,
+    source: item.source,
+  }));
 
   if (tickerItems.length === 0) {
     return null;
@@ -83,30 +72,21 @@ export function NewsTicker({ className = '' }: NewsTickerProps) {
                 key={`${item.id}-${index}`}
                 className="inline-flex items-center gap-2 px-6"
               >
-                {item.type === 'tip' ? (
-                  <>
-                    <Lightbulb className="h-3.5 w-3.5 text-yellow-500 flex-shrink-0" />
-                    <span className="text-sm text-foreground/80">{item.content}</span>
-                  </>
+                {item.url ? (
+                  <a 
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 hover:text-primary transition-colors group"
+                  >
+                    <span className="text-sm text-foreground/80 group-hover:text-primary">{item.content}</span>
+                    <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </a>
                 ) : (
-                  <>
-                    {item.url ? (
-                      <a 
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 hover:text-primary transition-colors group"
-                      >
-                        <span className="text-sm text-foreground/80 group-hover:text-primary">{item.content}</span>
-                        <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </a>
-                    ) : (
-                      <span className="text-sm text-foreground/80">{item.content}</span>
-                    )}
-                    {item.source && (
-                      <span className="text-xs text-muted-foreground">— {item.source}</span>
-                    )}
-                  </>
+                  <span className="text-sm text-foreground/80">{item.content}</span>
+                )}
+                {item.source && (
+                  <span className="text-xs text-muted-foreground">— {item.source}</span>
                 )}
                 <span className="text-muted-foreground/50 mx-4">•</span>
               </span>

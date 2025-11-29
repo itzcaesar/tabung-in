@@ -104,7 +104,8 @@ export function GoalsList({ goals }: Props) {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {activeGoals.map((goal) => {
-              const progress = Math.round((Number(goal.currentAmount) / Number(goal.targetAmount)) * 100);
+              const targetAmount = Number(goal.targetAmount) || 1; // Prevent division by zero
+              const progress = Math.round((Number(goal.currentAmount) / targetAmount) * 100);
               const remaining = Number(goal.targetAmount) - Number(goal.currentAmount);
               const categoryInfo = goalCategories.find(c => c.id === goal.category);
               const daysRemaining = getDaysRemaining(goal.deadline);

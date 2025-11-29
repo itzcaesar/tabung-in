@@ -13,10 +13,8 @@ interface DashboardGridClientProps {
   budgetsCard: ReactNode;
   billsCard: ReactNode;
   goalsCard: ReactNode;
-  newsCard: ReactNode;
   transactionsCard: ReactNode;
   categoriesCard: ReactNode;
-  insightsCard: ReactNode;
 }
 
 export function DashboardGridClient({
@@ -28,10 +26,8 @@ export function DashboardGridClient({
   budgetsCard,
   billsCard,
   goalsCard,
-  newsCard,
   transactionsCard,
   categoriesCard,
-  insightsCard,
 }: DashboardGridClientProps) {
   const children: Record<WidgetId, ReactNode> = {
     balance: balanceCard,
@@ -41,10 +37,8 @@ export function DashboardGridClient({
     budgets: budgetsCard,
     bills: billsCard,
     goals: goalsCard,
-    news: newsCard,
     transactions: transactionsCard,
     categories: categoriesCard,
-    insights: insightsCard,
   };
 
   return (

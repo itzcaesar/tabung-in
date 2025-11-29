@@ -8,14 +8,11 @@ import { Progress } from '@/components/ui/progress';
 import { TransactionList } from '@/components/dashboard/transaction-list';
 import { ExpenseChart } from '@/components/dashboard/expense-chart';
 import { CategoryBreakdown } from '@/components/dashboard/category-breakdown';
-import { FinancialNews } from '@/components/dashboard/financial-news';
 import { BillsWidget } from '@/components/dashboard/bills-widget';
 import { GoalsWidget } from '@/components/dashboard/goals-widget';
 import { NewsTicker } from '@/components/dashboard/news-ticker';
 import { DashboardGridClient } from '@/components/dashboard/dashboard-grid-client';
-import { InsightsWidget } from '@/components/dashboard/insights-widget';
 import { getUserPreferences } from '@/lib/actions/preferences';
-import { generateFinancialInsights } from '@/lib/services/insights';
 import { defaultWidgetConfig } from '@/lib/utils/widget-config';
 import { formatCurrency, getMonthRange } from '@/lib/utils';
 import {
@@ -239,10 +236,9 @@ export default async function DashboardPage() {
     redirect('/login');
   }
 
-  const [data, userPrefs, insights] = await Promise.all([
+  const [data, userPrefs] = await Promise.all([
     getDashboardData(session.user.id),
     getUserPreferences(),
-    generateFinancialInsights(session.user.id),
   ]);
   
   const widgets = userPrefs?.dashboardWidgets || defaultWidgetConfig;
@@ -442,7 +438,8 @@ export default async function DashboardPage() {
       <CardContent className="pt-0 flex-1 overflow-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {data.budgets.slice(0, 4).map((budget) => {
-            const percentage = budget.spent / Number(budget.amount) * 100;
+            const budgetAmount = Number(budget.amount) || 1; // Prevent division by zero
+            const percentage = budget.spent / budgetAmount * 100;
             const isOverBudget = percentage > 100;
             const isWarning = percentage > 80;
             return (
@@ -505,12 +502,6 @@ export default async function DashboardPage() {
 
   // Goals Card Widget
   const goalsCard = <GoalsWidget goals={data.goals} />;
-
-  // News Card Widget
-  const newsCard = <FinancialNews />;
-
-  // Insights Card Widget
-  const insightsCard = <InsightsWidget insights={insights} />;
 
   // Transactions Card Widget
   const transactionsCard = (
@@ -577,10 +568,8 @@ export default async function DashboardPage() {
         budgetsCard={budgetsCard}
         billsCard={billsCard}
         goalsCard={goalsCard}
-        newsCard={newsCard}
         transactionsCard={transactionsCard}
         categoriesCard={categoriesCard}
-        insightsCard={insightsCard}
       />
     </div>
   );

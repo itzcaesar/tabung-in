@@ -260,7 +260,7 @@ export default function DemoPage() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {demoAnggarans.map((anggaran) => {
-                const percentage = (anggaran.spent / anggaran.amount) * 100;
+                const percentage = (anggaran.spent / (anggaran.amount || 1)) * 100;
                 const isOverBudget = percentage > 100;
                 const isWarning = percentage > 80;
                 return (

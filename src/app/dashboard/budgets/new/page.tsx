@@ -287,11 +287,11 @@ export default function NewBudgetPage() {
               <div className="p-4 rounded-xl bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/20">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-muted-foreground">Batas {periods.find(p => p.value === selectedPeriod)?.label}</span>
-                  <span className="text-2xl font-bold text-foreground">{formatRupiah(parseInt(amount) || 0)}</span>
+                  <span className="text-2xl font-bold text-foreground">{formatCurrency(parseInt(amount) || 0)}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Peringatan di</span>
-                  <span className="text-amber-500 font-medium">{formatRupiah((parseInt(amount) || 0) * selectedThreshold / 100)}</span>
+                  <span className="text-amber-500 font-medium">{formatCurrency(Math.round((parseInt(amount) || 0) * selectedThreshold / 100))}</span>
                 </div>
                 <div className="mt-3 h-2 bg-muted rounded-full overflow-hidden">
                   <div 

@@ -6,9 +6,5 @@
     "app/**/*.ts": {
       "maxDuration": 30
     }
-  },
-  "env": {
-    "DATABASE_URL": "@database-url",
-    "AUTH_SECRET": "@auth-secret"
   }
 }

@@ -202,7 +202,8 @@ export function GoalsWidget({ goals, onUpdate }: GoalsWidgetProps) {
           ) : (
             <div className="space-y-3">
               {activeGoals.slice(0, 3).map((goal) => {
-                const progress = (Number(goal.currentAmount) / Number(goal.targetAmount)) * 100;
+                const targetAmount = Number(goal.targetAmount) || 1; // Prevent division by zero
+                const progress = (Number(goal.currentAmount) / targetAmount) * 100;
                 const remaining = Number(goal.targetAmount) - Number(goal.currentAmount);
                 const requiredDaily = getRequiredDaily(goal);
                 
@@ -397,7 +398,7 @@ export function GoalsWidget({ goals, onUpdate }: GoalsWidgetProps) {
                 </div>
               </div>
               <Progress 
-                value={(Number(selectedGoal.currentAmount) / Number(selectedGoal.targetAmount)) * 100} 
+                value={(Number(selectedGoal.currentAmount) / (Number(selectedGoal.targetAmount) || 1)) * 100} 
                 className="h-2"
               />
             </div>
