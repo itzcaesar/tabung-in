@@ -55,8 +55,11 @@ export function LandingNewsTicker() {
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
+          {/* Gradient mask to fade text on the left */}
+          <div className="absolute left-0 top-0 bottom-0 w-32 sm:w-40 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+          
           {/* Label */}
-          <div className="absolute left-0 top-0 bottom-0 z-20 flex items-center pl-4 pr-8 bg-background">
+          <div className="absolute left-0 top-0 bottom-0 z-20 flex items-center pl-4 pr-4">
             <div className="flex items-center gap-2 text-emerald-500">
               <Newspaper className="h-4 w-4" />
               <span className="text-xs font-semibold uppercase tracking-wider hidden sm:inline">Berita</span>
