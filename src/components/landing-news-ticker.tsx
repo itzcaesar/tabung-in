@@ -56,7 +56,7 @@ export function LandingNewsTicker() {
           onMouseLeave={() => setIsPaused(false)}
         >
           {/* Label */}
-          <div className="absolute left-0 top-0 bottom-0 z-20 flex items-center pl-4 pr-8 bg-gradient-to-r from-background via-background to-transparent">
+          <div className="absolute left-0 top-0 bottom-0 z-20 flex items-center pl-4 pr-8 bg-background">
             <div className="flex items-center gap-2 text-emerald-500">
               <Newspaper className="h-4 w-4" />
               <span className="text-xs font-semibold uppercase tracking-wider hidden sm:inline">Berita</span>
