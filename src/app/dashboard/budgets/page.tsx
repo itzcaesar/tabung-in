@@ -5,10 +5,19 @@ import { budgets, transactions } from '@/lib/db/schema';
 import { eq, and, gte, sql } from 'drizzle-orm';
 import { BudgetCard } from '@/components/dashboard/budget-card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Plus, PiggyBank } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Plus, PiggyBank, Target, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
 import Link from 'next/link';
 import { getMonthRange } from '@/lib/utils';
+
+function formatRupiah(amount: number): string {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
 
 export default async function BudgetsPage() {
   const session = await auth();
@@ -32,7 +41,7 @@ export default async function BudgetsPage() {
     .where(
       and(
         eq(transactions.userId, session.user.id),
-        eq(transactions.type, 'expense'),
+        eq(transactions.type, 'pengeluaran'),
         gte(transactions.date, start)
       )
     )
@@ -47,53 +56,124 @@ export default async function BudgetsPage() {
     spent: budget.categoryId ? spendingMap.get(budget.categoryId) || 0 : 0,
   }));
 
+  // Calculate stats
+  const totalBudget = budgetsWithSpending.reduce((acc, b) => acc + Number(b.amount), 0);
+  const totalSpent = budgetsWithSpending.reduce((acc, b) => acc + b.spent, 0);
+  const remaining = totalBudget - totalSpent;
+  const budgetsOverLimit = budgetsWithSpending.filter(b => b.spent > Number(b.amount)).length;
+  const budgetsNearLimit = budgetsWithSpending.filter(b => {
+    const percentage = (b.spent / Number(b.amount)) * 100;
+    return percentage >= 80 && percentage < 100;
+  }).length;
+
+  const stats = [
+    {
+      label: 'Total Anggaran',
+      value: formatRupiah(totalBudget),
+      icon: Target,
+      color: 'bg-blue-500/10 text-blue-500',
+    },
+    {
+      label: 'Total Terpakai',
+      value: formatRupiah(totalSpent),
+      icon: TrendingDown,
+      color: 'bg-red-500/10 text-red-500',
+    },
+    {
+      label: 'Sisa Anggaran',
+      value: formatRupiah(remaining),
+      icon: TrendingUp,
+      color: remaining >= 0 ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500',
+    },
+    {
+      label: 'Perlu Perhatian',
+      value: `${budgetsNearLimit + budgetsOverLimit} Anggaran`,
+      icon: AlertTriangle,
+      color: budgetsOverLimit > 0 ? 'bg-red-500/10 text-red-500' : budgetsNearLimit > 0 ? 'bg-amber-500/10 text-amber-500' : 'bg-green-500/10 text-green-500',
+    },
+  ];
+
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Budgets</h1>
+          <h1 className="text-3xl font-bold text-foreground">Anggaran</h1>
           <p className="text-muted-foreground mt-1">
-            Set spending limits and track your progress
+            Tetapkan batas pengeluaran dan pantau kemajuan Anda
           </p>
         </div>
         <Link href="/dashboard/budgets/new">
-          <Button>
+          <Button className="w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" />
-            Create Budget
+            Buat Anggaran
           </Button>
         </Link>
       </div>
 
-      {budgetsWithSpending.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {budgetsWithSpending.map((budget) => (
-            <BudgetCard
-              key={budget.id}
-              name={budget.name}
-              spent={budget.spent}
-              limit={Number(budget.amount)}
-              category={budget.category?.name}
-            />
-          ))}
+      {/* Stats Cards */}
+      {budgetsWithSpending.length > 0 && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {stats.map((stat, idx) => {
+            const Icon = stat.icon;
+            return (
+              <Card key={idx} className="overflow-hidden">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2.5 rounded-lg ${stat.color}`}>
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm text-muted-foreground truncate">{stat.label}</p>
+                      <p className="text-lg font-bold text-foreground truncate">{stat.value}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
+      )}
+
+      {budgetsWithSpending.length > 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <PiggyBank className="h-5 w-5 text-muted-foreground" />
+              Daftar Anggaran
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {budgetsWithSpending.map((budget) => (
+                <BudgetCard
+                  key={budget.id}
+                  name={budget.name}
+                  spent={budget.spent}
+                  limit={Number(budget.amount)}
+                  category={budget.category?.name}
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       ) : (
         <Card>
           <CardContent className="py-16">
             <div className="flex flex-col items-center text-center">
-              <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mb-4">
-                <PiggyBank className="h-8 w-8 text-muted-foreground" />
+              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-green-500/20 to-blue-500/20 flex items-center justify-center mb-4">
+                <PiggyBank className="h-8 w-8 text-green-500" />
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">
-                No budgets yet
+                Belum ada anggaran
               </h3>
               <p className="text-muted-foreground mb-6 max-w-sm">
-                Create your first budget to start tracking your spending limits
-                by category.
+                Buat anggaran pertama Anda untuk mulai melacak batas pengeluaran
+                per kategori dan mengontrol keuangan dengan lebih baik.
               </p>
               <Link href="/dashboard/budgets/new">
-                <Button>
+                <Button size="lg">
                   <Plus className="h-4 w-4 mr-2" />
-                  Create Your First Budget
+                  Buat Anggaran Pertama
                 </Button>
               </Link>
             </div>

@@ -6,7 +6,7 @@ import { ArrowUpRight, ArrowDownLeft, ArrowLeftRight } from 'lucide-react';
 
 export interface Transaction {
   id: string;
-  type: 'income' | 'expense' | 'transfer';
+  type: 'pemasukan' | 'pengeluaran' | 'transfer';
   amount: string | number;
   description: string | null;
   date: Date;
@@ -48,15 +48,15 @@ export function TransactionList({
           <div
             className={cn(
               'flex h-10 w-10 items-center justify-center rounded-xl',
-              transaction.type === 'income' && 'bg-emerald-500/20',
-              transaction.type === 'expense' && 'bg-red-500/20',
+              transaction.type === 'pemasukan' && 'bg-emerald-500/20',
+              transaction.type === 'pengeluaran' && 'bg-red-500/20',
               transaction.type === 'transfer' && 'bg-blue-500/20'
             )}
           >
-            {transaction.type === 'income' && (
+            {transaction.type === 'pemasukan' && (
               <ArrowDownLeft className="h-5 w-5 text-emerald-500" />
             )}
-            {transaction.type === 'expense' && (
+            {transaction.type === 'pengeluaran' && (
               <ArrowUpRight className="h-5 w-5 text-red-500" />
             )}
             {transaction.type === 'transfer' && (
@@ -81,12 +81,12 @@ export function TransactionList({
           <p
             className={cn(
               'text-lg font-semibold',
-              transaction.type === 'income' && 'text-emerald-500',
-              transaction.type === 'expense' && 'text-red-500',
+              transaction.type === 'pemasukan' && 'text-emerald-500',
+              transaction.type === 'pengeluaran' && 'text-red-500',
               transaction.type === 'transfer' && 'text-blue-500'
             )}
           >
-            {transaction.type === 'income' ? '+' : transaction.type === 'expense' ? '-' : ''}
+            {transaction.type === 'pemasukan' ? '+' : transaction.type === 'pengeluaran' ? '-' : ''}
             {formatCurrency(Number(transaction.amount))}
           </p>
         </button>

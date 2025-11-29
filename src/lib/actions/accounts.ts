@@ -8,10 +8,11 @@ import { auth } from '@/lib/auth';
 import { eq, and } from 'drizzle-orm';
 
 const accountSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  type: z.string().min(1, 'Type is required'),
+  name: z.string().min(1, 'Nama dompet wajib diisi'),
+  type: z.enum(['rekening', 'emoney', 'tunai']),
+  provider: z.string().optional(),
   balance: z.coerce.number().default(0),
-  currency: z.string().default('USD'),
+  currency: z.string().default('IDR'),
   icon: z.string().optional(),
   color: z.string().optional(),
 });
@@ -28,14 +29,15 @@ export async function createAccount(
 ): Promise<AccountState> {
   const session = await auth();
   if (!session?.user?.id) {
-    return { errors: { general: ['Unauthorized'] } };
+    return { errors: { general: ['Tidak terautentikasi'] } };
   }
 
   const validatedFields = accountSchema.safeParse({
     name: formData.get('name'),
     type: formData.get('type'),
+    provider: formData.get('provider') || undefined,
     balance: formData.get('balance') || 0,
-    currency: formData.get('currency') || 'USD',
+    currency: formData.get('currency') || 'IDR',
     icon: formData.get('icon'),
     color: formData.get('color'),
   });
@@ -47,15 +49,20 @@ export async function createAccount(
   try {
     await db.insert(accounts).values({
       userId: session.user.id,
-      ...validatedFields.data,
+      name: validatedFields.data.name,
+      type: validatedFields.data.type,
+      provider: validatedFields.data.provider || null,
       balance: validatedFields.data.balance.toString(),
+      currency: validatedFields.data.currency,
+      icon: validatedFields.data.icon,
+      color: validatedFields.data.color,
     });
 
     revalidatePath('/dashboard');
     revalidatePath('/dashboard/accounts');
-    return { success: true, message: 'Account created successfully' };
+    return { success: true, message: 'Dompet berhasil dibuat' };
   } catch {
-    return { errors: { general: ['Failed to create account'] } };
+    return { errors: { general: ['Gagal membuat dompet'] } };
   }
 }
 

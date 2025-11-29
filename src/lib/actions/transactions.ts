@@ -10,8 +10,8 @@ import { eq, and, sql } from 'drizzle-orm';
 const transactionSchema = z.object({
   accountId: z.string().uuid(),
   categoryId: z.string().uuid().optional().nullable(),
-  type: z.enum(['income', 'expense', 'transfer']),
-  amount: z.coerce.number().positive('Amount must be positive'),
+  type: z.enum(['pemasukan', 'pengeluaran', 'transfer']),
+  amount: z.coerce.number().positive('Jumlah harus lebih dari 0'),
   description: z.string().optional(),
   date: z.coerce.date(),
 });
@@ -57,7 +57,7 @@ export async function createTransaction(
       date,
     });
 
-    const balanceChange = type === 'income' ? amount : -amount;
+    const balanceChange = type === 'pemasukan' ? amount : -amount;
     await db
       .update(accounts)
       .set({
@@ -132,7 +132,7 @@ export async function deleteTransaction(id: string): Promise<TransactionState> {
     }
 
     const balanceChange =
-      transaction.type === 'income'
+      transaction.type === 'pemasukan'
         ? -Number(transaction.amount)
         : Number(transaction.amount);
 
@@ -151,5 +151,59 @@ export async function deleteTransaction(id: string): Promise<TransactionState> {
     return { success: true, message: 'Transaction deleted successfully' };
   } catch {
     return { errors: { general: ['Failed to delete transaction'] } };
+  }
+}
+
+export async function createTransactionFromReceipt(data: {
+  accountId: string;
+  description: string;
+  amount: number;
+  date: string;
+  receiptUrl?: string;
+}): Promise<TransactionState> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { errors: { general: ['Tidak terautentikasi'] } };
+  }
+
+  try {
+    // Validasi account exists dan milik user
+    const account = await db.query.accounts.findFirst({
+      where: and(eq(accounts.id, data.accountId), eq(accounts.userId, session.user.id)),
+    });
+
+    if (!account) {
+      return { errors: { general: ['Dompet tidak ditemukan'] } };
+    }
+
+    // Parse date
+    const transactionDate = data.date ? new Date(data.date) : new Date();
+
+    await db.insert(transactions).values({
+      userId: session.user.id,
+      accountId: data.accountId,
+      type: 'pengeluaran',
+      amount: data.amount.toString(),
+      description: data.description,
+      date: transactionDate,
+      receiptUrl: data.receiptUrl || null,
+    });
+
+    // Update account balance
+    await db
+      .update(accounts)
+      .set({
+        balance: sql`${accounts.balance} - ${data.amount}`,
+        updatedAt: new Date(),
+      })
+      .where(eq(accounts.id, data.accountId));
+
+    revalidatePath('/dashboard');
+    revalidatePath('/dashboard/transactions');
+    revalidatePath('/dashboard/receipts');
+    return { success: true, message: 'Transaksi berhasil disimpan' };
+  } catch (error) {
+    console.error('Error creating transaction from receipt:', error);
+    return { errors: { general: ['Gagal menyimpan transaksi'] } };
   }
 }

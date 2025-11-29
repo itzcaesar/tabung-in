@@ -8,10 +8,10 @@ import { auth } from '@/lib/auth';
 import { eq, and } from 'drizzle-orm';
 
 const budgetSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
+  name: z.string().min(1, 'Nama wajib diisi'),
   categoryId: z.string().uuid().optional().nullable(),
-  amount: z.coerce.number().positive('Amount must be positive'),
-  period: z.enum(['daily', 'weekly', 'monthly', 'yearly']),
+  amount: z.coerce.number().positive('Jumlah harus lebih dari 0'),
+  period: z.enum(['harian', 'mingguan', 'bulanan', 'tahunan']),
   startDate: z.coerce.date(),
   alertThreshold: z.coerce.number().min(0).max(100).default(80),
 });
