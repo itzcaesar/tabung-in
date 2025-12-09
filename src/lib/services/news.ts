@@ -82,10 +82,23 @@ async function parseRSSFeed(feedUrl: string, source: string): Promise<NewsItem[]
         }
         
         if (isFinancial) {
+          // Sanitize description: remove all HTML tags properly and decode entities
+          let cleanDesc = '';
+          if (descMatch) {
+            // Replace HTML tags iteratively until none remain
+            let text = descMatch[1];
+            let prevText;
+            do {
+              prevText = text;
+              text = text.replace(/<[^>]*>/g, '');
+            } while (text !== prevText);
+            cleanDesc = text.trim().slice(0, 120) + '...';
+          }
+          
           items.push({
             id: `${source}-${items.length}-${Date.now()}`,
             title,
-            description: descMatch ? descMatch[1].replace(/<[^>]*>/g, '').trim().slice(0, 120) + '...' : '',
+            description: cleanDesc,
             url: linkMatch[1].trim(),
             source,
             publishedAt: pubDateMatch ? new Date(pubDateMatch[1]) : new Date(),
