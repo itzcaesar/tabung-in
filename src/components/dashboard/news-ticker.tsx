@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { TrendingUp, ExternalLink } from 'lucide-react';
 import { NewsItem } from '@/lib/types/news';
 

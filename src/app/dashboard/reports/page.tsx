@@ -91,15 +91,29 @@ export default async function ReportsPage() {
     color: c.categoryColor || '#71717a',
   }));
 
+  // Optimize: Create a Map for faster daily stats lookup
+  const dailyStatsMap = new Map<string, { income: number; expense: number }>();
+  for (const stat of dailyStats) {
+    if (!dailyStatsMap.has(stat.date)) {
+      dailyStatsMap.set(stat.date, { income: 0, expense: 0 });
+    }
+    const day = dailyStatsMap.get(stat.date)!;
+    if (stat.type === 'pemasukan') {
+      day.income = stat.total;
+    } else {
+      day.expense = stat.total;
+    }
+  }
+
   const chartData = Array.from({ length: 30 }, (_, i) => {
     const date = new Date();
     date.setDate(date.getDate() - (29 - i));
     const dateStr = date.toISOString().split('T')[0];
-    const dayData = dailyStats.filter((d) => d.date === dateStr);
+    const dayData = dailyStatsMap.get(dateStr) || { income: 0, expense: 0 };
     return {
       date: dateStr,
-      income: dayData.find((d) => d.type === 'pemasukan')?.total || 0,
-      expense: dayData.find((d) => d.type === 'pengeluaran')?.total || 0,
+      income: dayData.income,
+      expense: dayData.expense,
     };
   });
 
