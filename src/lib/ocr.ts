@@ -15,7 +15,9 @@ export interface ItemStruk {
 }
 
 // Cache the Tesseract worker for better performance across multiple scans
+// Note: For concurrent operations, consider implementing a worker pool
 let workerInstance: Tesseract.Worker | null = null;
+let isProcessing = false;
 
 async function getWorker(): Promise<Tesseract.Worker> {
   if (!workerInstance) {
@@ -28,17 +30,27 @@ export async function ekstrakTeksStruk(
   sumberGambar: File | string,
   onProgress?: (progress: number) => void
 ): Promise<string> {
-  const worker = await getWorker();
+  // Wait if another operation is in progress
+  while (isProcessing) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
   
-  const result = await worker.recognize(sumberGambar, {
-    logger: (m) => {
-      if (m.status === 'recognizing text' && onProgress) {
-        onProgress(Math.round(m.progress * 100));
-      }
-    },
-  });
+  isProcessing = true;
+  try {
+    const worker = await getWorker();
+    
+    const result = await worker.recognize(sumberGambar, {
+      logger: (m) => {
+        if (m.status === 'recognizing text' && onProgress) {
+          onProgress(Math.round(m.progress * 100));
+        }
+      },
+    });
 
-  return result.data.text;
+    return result.data.text;
+  } finally {
+    isProcessing = false;
+  }
 }
 
 // Cleanup function for when the worker is no longer needed

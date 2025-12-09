@@ -72,8 +72,14 @@ async function parseRSSFeed(feedUrl: string, source: string): Promise<NewsItem[]
         const title = titleMatch[1].trim();
         const titleLower = title.toLowerCase();
         
-        // Optimized: Check if any financial keyword exists in title
-        const isFinancial = Array.from(financialKeywords).some(keyword => titleLower.includes(keyword));
+        // Optimized: Check if any financial keyword exists in title using for-of
+        let isFinancial = false;
+        for (const keyword of financialKeywords) {
+          if (titleLower.includes(keyword)) {
+            isFinancial = true;
+            break;
+          }
+        }
         
         if (isFinancial) {
           items.push({

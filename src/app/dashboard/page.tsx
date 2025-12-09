@@ -68,7 +68,8 @@ async function getDashboardData(userId: string) {
   thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
   // Calculate date range once for reuse
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const SEVEN_DAYS_IN_MS = 7 * 24 * 60 * 60 * 1000;
+  const sevenDaysAgo = new Date(Date.now() - SEVEN_DAYS_IN_MS);
 
   // Optimize: Include categorySpending in the initial Promise.all to reduce sequential queries
   const [
