@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -20,7 +20,8 @@ interface ExpenseChartProps {
   }>;
 }
 
-export function ExpenseChart({ data }: ExpenseChartProps) {
+// Optimize: Memoize component to prevent unnecessary re-renders
+export const ExpenseChart = memo(function ExpenseChart({ data }: ExpenseChartProps) {
   const chartData = useMemo(() => {
     return data.map((item) => ({
       ...item,
@@ -93,4 +94,4 @@ export function ExpenseChart({ data }: ExpenseChartProps) {
       </ResponsiveContainer>
     </div>
   );
-}
+});

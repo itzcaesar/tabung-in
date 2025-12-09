@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { ArrowUpRight, ArrowDownLeft, ArrowLeftRight } from 'lucide-react';
@@ -20,7 +21,8 @@ interface TransactionListProps {
   showAccount?: boolean;
 }
 
-export function TransactionList({
+// Optimize: Memoize component to prevent unnecessary re-renders
+export const TransactionList = memo(function TransactionList({
   transactions,
   onTransactionClick,
   showAccount = false,
@@ -87,4 +89,4 @@ export function TransactionList({
       ))}
     </div>
   );
-}
+});

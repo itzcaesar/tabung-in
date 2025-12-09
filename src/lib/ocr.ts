@@ -14,11 +14,23 @@ export interface ItemStruk {
   harga: number;
 }
 
+// Cache the Tesseract worker for better performance across multiple scans
+let workerInstance: Tesseract.Worker | null = null;
+
+async function getWorker(): Promise<Tesseract.Worker> {
+  if (!workerInstance) {
+    workerInstance = await Tesseract.createWorker('ind+eng');
+  }
+  return workerInstance;
+}
+
 export async function ekstrakTeksStruk(
   sumberGambar: File | string,
   onProgress?: (progress: number) => void
 ): Promise<string> {
-  const result = await Tesseract.recognize(sumberGambar, 'ind+eng', {
+  const worker = await getWorker();
+  
+  const result = await worker.recognize(sumberGambar, {
     logger: (m) => {
       if (m.status === 'recognizing text' && onProgress) {
         onProgress(Math.round(m.progress * 100));
@@ -27,6 +39,14 @@ export async function ekstrakTeksStruk(
   });
 
   return result.data.text;
+}
+
+// Cleanup function for when the worker is no longer needed
+export async function terminateWorker(): Promise<void> {
+  if (workerInstance) {
+    await workerInstance.terminate();
+    workerInstance = null;
+  }
 }
 
 export function parseDataStruk(teksAsli: string): DataStruk {
@@ -105,10 +125,16 @@ function ekstrakTotal(teks: string): number | null {
   return maxAmount > 0 ? maxAmount : null;
 }
 
+// Optimize: Compile skip patterns once
+const SKIP_PATTERNS = [
+  /^(total|subtotal|sub\s*total|tax|pajak|ppn|diskon|discount|tunai|cash|kembalian|change|payment|debit|credit|kartu|card|thank|please|closed|check\s*no|pos\d*|\-{3,}|={3,})/i,
+  /^(ruko|jl\.|jln\.|alamat|telp|phone|fax|www\.|http|\.com|@)/i,
+];
+
 function ekstrakItems(baris: string[]): ItemStruk[] {
   const items: ItemStruk[] = [];
 
-  // Pattern untuk berbagai format struk Indonesia
+  // Optimize: Compile patterns once outside the loop
   const patterns = [
     // Format: 1 Bread Butter Pudding 11,500 atau 1 Bread Butter Pudding 11.500
     /^(\d+)\s+(.+?)\s+([\d][.\d]*[,.]?\d{3})$/,
@@ -125,12 +151,11 @@ function ekstrakItems(baris: string[]): ItemStruk[] {
   for (const line of baris) {
     const cleaned = line.trim();
 
-    // Skip baris yang bukan item
-    if (
-      cleaned.match(/^(total|subtotal|sub\s*total|tax|pajak|ppn|diskon|discount|tunai|cash|kembalian|change|payment|debit|credit|kartu|card|thank|please|closed|check\s*no|pos\d*|\-{3,}|={3,})/i) ||
-      cleaned.match(/^(ruko|jl\.|jln\.|alamat|telp|phone|fax|www\.|http|\.com|@)/i) ||
-      cleaned.length < 4
-    ) {
+    // Skip baris yang bukan item - optimize: check length first (fastest check)
+    if (cleaned.length < 4) continue;
+    
+    // Optimize: Use some() for early exit
+    if (SKIP_PATTERNS.some(pattern => pattern.test(cleaned))) {
       continue;
     }
 

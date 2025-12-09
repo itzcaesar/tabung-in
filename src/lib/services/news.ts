@@ -51,45 +51,41 @@ async function parseRSSFeed(feedUrl: string, source: string): Promise<NewsItem[]
     const xml = await response.text();
     const items: NewsItem[] = [];
     
-    // Simple regex parsing untuk RSS
-    const itemRegex = /<item>([\s\S]*?)<\/item>/g;
-    const titleRegex = /<title><!\[CDATA\[(.*?)\]\]><\/title>|<title>(.*?)<\/title>/;
-    const linkRegex = /<link>(.*?)<\/link>/;
-    const descRegex = /<description><!\[CDATA\[(.*?)\]\]><\/description>|<description>(.*?)<\/description>/;
-    const pubDateRegex = /<pubDate>(.*?)<\/pubDate>/;
+    // Optimized: Compile regexes once and use more efficient matching
+    const itemMatches = xml.matchAll(/<item>([\s\S]*?)<\/item>/g);
     
-    let match;
-    while ((match = itemRegex.exec(xml)) !== null) {
-      const item = match[1];
+    // Financial keywords set for faster lookup
+    const financialKeywords = new Set(['saham', 'rupiah', 'investasi', 'ekonomi', 'bank', 'keuangan', 'inflasi', 'pajak']);
+    
+    for (const itemMatch of itemMatches) {
+      if (items.length >= 5) break; // Early exit when we have enough items
       
-      const titleMatch = titleRegex.exec(item);
-      const linkMatch = linkRegex.exec(item);
-      const descMatch = descRegex.exec(item);
-      const pubDateMatch = pubDateRegex.exec(item);
+      const item = itemMatch[1];
+      
+      // Extract all fields in a single pass through the item
+      const titleMatch = item.match(/<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/);
+      const linkMatch = item.match(/<link>(.*?)<\/link>/);
+      const descMatch = item.match(/<description>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/description>/);
+      const pubDateMatch = item.match(/<pubDate>(.*?)<\/pubDate>/);
       
       if (titleMatch && linkMatch) {
-        const title = (titleMatch[1] || titleMatch[2] || '').trim();
-        // Filter hanya berita finansial
-        if (title.toLowerCase().includes('saham') || 
-            title.toLowerCase().includes('rupiah') ||
-            title.toLowerCase().includes('investasi') ||
-            title.toLowerCase().includes('ekonomi') ||
-            title.toLowerCase().includes('bank') ||
-            title.toLowerCase().includes('keuangan') ||
-            title.toLowerCase().includes('inflasi') ||
-            title.toLowerCase().includes('pajak')) {
+        const title = titleMatch[1].trim();
+        const titleLower = title.toLowerCase();
+        
+        // Optimized: Check if any financial keyword exists in title
+        const isFinancial = Array.from(financialKeywords).some(keyword => titleLower.includes(keyword));
+        
+        if (isFinancial) {
           items.push({
             id: `${source}-${items.length}-${Date.now()}`,
             title,
-            description: (descMatch?.[1] || descMatch?.[2] || '').replace(/<[^>]*>/g, '').trim().slice(0, 120) + '...',
+            description: descMatch ? descMatch[1].replace(/<[^>]*>/g, '').trim().slice(0, 120) + '...' : '',
             url: linkMatch[1].trim(),
             source,
             publishedAt: pubDateMatch ? new Date(pubDateMatch[1]) : new Date(),
           });
         }
       }
-      
-      if (items.length >= 5) break;
     }
     
     return items;

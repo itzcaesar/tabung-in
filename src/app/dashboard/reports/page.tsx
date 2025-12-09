@@ -16,6 +16,7 @@ export default async function ReportsPage() {
     redirect('/login');
   }
 
+  // Optimize: Calculate date once and reuse
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 

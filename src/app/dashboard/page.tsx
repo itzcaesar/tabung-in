@@ -67,6 +67,10 @@ async function getDashboardData(userId: string) {
   const thirtyDaysFromNow = new Date();
   thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
+  // Calculate date range once for reuse
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  // Optimize: Include categorySpending in the initial Promise.all to reduce sequential queries
   const [
     userAccounts,
     recentTransactions,
@@ -76,6 +80,7 @@ async function getDashboardData(userId: string) {
     dailyStats,
     userBills,
     userGoals,
+    categorySpending,
   ] = await Promise.all([
     db.query.accounts.findMany({
       where: eq(accounts.userId, userId),
@@ -130,7 +135,7 @@ async function getDashboardData(userId: string) {
       .where(
         and(
           eq(transactions.userId, userId),
-          gte(transactions.date, new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
+          gte(transactions.date, sevenDaysAgo)
         )
       )
       .groupBy(sql`date(${transactions.date})`, transactions.type),
@@ -149,6 +154,21 @@ async function getDashboardData(userId: string) {
       ),
       orderBy: [desc(goals.priority), desc(goals.createdAt)],
     }),
+    // Optimize: Moved categorySpending query into Promise.all
+    db
+      .select({
+        categoryId: transactions.categoryId,
+        total: sql<number>`sum(${transactions.amount}::numeric)`,
+      })
+      .from(transactions)
+      .where(
+        and(
+          eq(transactions.userId, userId),
+          eq(transactions.type, 'pengeluaran'),
+          gte(transactions.date, start)
+        )
+      )
+      .groupBy(transactions.categoryId),
   ]);
 
   const totalBalance = userAccounts.reduce(
@@ -159,22 +179,6 @@ async function getDashboardData(userId: string) {
     monthlyStats.find((s) => s.type === 'pemasukan')?.total || 0;
   const monthlyExpenses =
     monthlyStats.find((s) => s.type === 'pengeluaran')?.total || 0;
-
-  // Calculate spending per category for budgets
-  const categorySpending = await db
-    .select({
-      categoryId: transactions.categoryId,
-      total: sql<number>`sum(${transactions.amount}::numeric)`,
-    })
-    .from(transactions)
-    .where(
-      and(
-        eq(transactions.userId, userId),
-        eq(transactions.type, 'pengeluaran'),
-        gte(transactions.date, start)
-      )
-    )
-    .groupBy(transactions.categoryId);
 
   const spendingMap = new Map(
     categorySpending.map((s) => [s.categoryId, s.total])
