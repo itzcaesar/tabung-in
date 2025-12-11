@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { formatCurrency, formatPercent } from '@/lib/utils';
 
@@ -25,7 +25,8 @@ const COLORS = [
   '#f59e0b',
 ];
 
-export function CategoryBreakdown({ data }: CategoryBreakdownProps) {
+// Optimize: Memoize component to prevent unnecessary re-renders
+export const CategoryBreakdown = memo(function CategoryBreakdown({ data }: CategoryBreakdownProps) {
   const total = useMemo(() => data.reduce((sum, item) => sum + item.value, 0), [data]);
 
   const chartData = useMemo(() => {
@@ -94,4 +95,4 @@ export function CategoryBreakdown({ data }: CategoryBreakdownProps) {
       </div>
     </div>
   );
-}
+});

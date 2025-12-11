@@ -67,6 +67,11 @@ async function getDashboardData(userId: string) {
   const thirtyDaysFromNow = new Date();
   thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
+  // Calculate date range once for reuse
+  const SEVEN_DAYS_IN_MS = 7 * 24 * 60 * 60 * 1000;
+  const sevenDaysAgo = new Date(Date.now() - SEVEN_DAYS_IN_MS);
+
+  // Optimize: Include categorySpending in the initial Promise.all to reduce sequential queries
   const [
     userAccounts,
     recentTransactions,
@@ -76,6 +81,7 @@ async function getDashboardData(userId: string) {
     dailyStats,
     userBills,
     userGoals,
+    categorySpending,
   ] = await Promise.all([
     db.query.accounts.findMany({
       where: eq(accounts.userId, userId),
@@ -130,7 +136,7 @@ async function getDashboardData(userId: string) {
       .where(
         and(
           eq(transactions.userId, userId),
-          gte(transactions.date, new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
+          gte(transactions.date, sevenDaysAgo)
         )
       )
       .groupBy(sql`date(${transactions.date})`, transactions.type),
@@ -149,6 +155,21 @@ async function getDashboardData(userId: string) {
       ),
       orderBy: [desc(goals.priority), desc(goals.createdAt)],
     }),
+    // Optimize: Moved categorySpending query into Promise.all
+    db
+      .select({
+        categoryId: transactions.categoryId,
+        total: sql<number>`sum(${transactions.amount}::numeric)`,
+      })
+      .from(transactions)
+      .where(
+        and(
+          eq(transactions.userId, userId),
+          eq(transactions.type, 'pengeluaran'),
+          gte(transactions.date, start)
+        )
+      )
+      .groupBy(transactions.categoryId),
   ]);
 
   const totalBalance = userAccounts.reduce(
@@ -160,35 +181,33 @@ async function getDashboardData(userId: string) {
   const monthlyExpenses =
     monthlyStats.find((s) => s.type === 'pengeluaran')?.total || 0;
 
-  // Calculate spending per category for budgets
-  const categorySpending = await db
-    .select({
-      categoryId: transactions.categoryId,
-      total: sql<number>`sum(${transactions.amount}::numeric)`,
-    })
-    .from(transactions)
-    .where(
-      and(
-        eq(transactions.userId, userId),
-        eq(transactions.type, 'pengeluaran'),
-        gte(transactions.date, start)
-      )
-    )
-    .groupBy(transactions.categoryId);
-
   const spendingMap = new Map(
     categorySpending.map((s) => [s.categoryId, s.total])
   );
+
+  // Optimize: Create a Map for faster daily stats lookup
+  const dailyStatsMap = new Map<string, { income: number; expense: number }>();
+  for (const stat of dailyStats) {
+    if (!dailyStatsMap.has(stat.date)) {
+      dailyStatsMap.set(stat.date, { income: 0, expense: 0 });
+    }
+    const day = dailyStatsMap.get(stat.date)!;
+    if (stat.type === 'pemasukan') {
+      day.income = stat.total;
+    } else {
+      day.expense = stat.total;
+    }
+  }
 
   const chartData = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
     date.setDate(date.getDate() - (6 - i));
     const dateStr = date.toISOString().split('T')[0];
-    const dayData = dailyStats.filter((d) => d.date === dateStr);
+    const dayData = dailyStatsMap.get(dateStr) || { income: 0, expense: 0 };
     return {
       date: dateStr,
-      income: dayData.find((d) => d.type === 'pemasukan')?.total || 0,
-      expense: dayData.find((d) => d.type === 'pengeluaran')?.total || 0,
+      income: dayData.income,
+      expense: dayData.expense,
     };
   });
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { TrendingUp, ExternalLink } from 'lucide-react';
 import { NewsItem } from '@/lib/types/news';
 
@@ -11,26 +11,28 @@ interface NewsTickerProps {
 export function NewsTicker({ className = '' }: NewsTickerProps) {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [isPaused, setIsPaused] = useState(false);
-  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
-    if (!hasFetchedRef.current) {
-      hasFetchedRef.current = true;
-      fetchNews();
-    }
-  }, []);
-
-  const fetchNews = async () => {
-    try {
-      const response = await fetch('/api/news');
-      if (response.ok) {
-        const data = await response.json();
-        setNews(data);
+    let mounted = true;
+    
+    async function fetchNews() {
+      try {
+        const response = await fetch('/api/news');
+        if (response.ok && mounted) {
+          const data = await response.json();
+          setNews(data);
+        }
+      } catch (error) {
+        console.error('Error fetching news:', error);
       }
-    } catch (error) {
-      console.error('Error fetching news:', error);
     }
-  };
+    
+    fetchNews();
+    
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Only show news in ticker
   const tickerItems = news.map((item, i) => ({
